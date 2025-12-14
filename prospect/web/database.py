@@ -1,10 +1,13 @@
 """Database models for prospect persistence."""
 
 import os
+import logging
 from datetime import datetime
 from typing import Optional, List, Generator
 from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, DateTime, Text, ForeignKey, JSON
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
+
+logger = logging.getLogger(__name__)
 
 
 def get_database_url() -> str:
@@ -44,6 +47,41 @@ if DATABASE_URL.startswith("sqlite"):
 engine = create_engine(DATABASE_URL, connect_args=connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+
+
+class SearchConfig(Base):
+    """
+    Search depth configuration.
+
+    Defines tiered search depths for controlling API usage and prospect coverage.
+    """
+    __tablename__ = "search_configs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(50), unique=True, nullable=False)  # quick, standard, deep, exhaustive
+    description = Column(String(255))
+
+    # Pagination
+    organic_pages = Column(Integer, default=1)  # How many pages of organic results
+    maps_pages = Column(Integer, default=1)     # How many pages of maps results
+
+    # Query expansion
+    use_query_variations = Column(Boolean, default=False)
+    query_variations = Column(JSON, default=[])  # Additional query templates
+
+    # Location expansion
+    use_location_expansion = Column(Boolean, default=False)
+    expansion_radius_km = Column(Integer, default=0)  # 0 = no expansion
+    max_locations = Column(Integer, default=1)
+
+    # Search types
+    search_organic = Column(Boolean, default=True)
+    search_maps = Column(Boolean, default=True)
+    search_local_services = Column(Boolean, default=False)
+
+    # Cost controls
+    max_api_calls = Column(Integer, default=5)
+    estimated_cost_cents = Column(Integer, default=5)
 
 
 class Campaign(Base):
@@ -97,6 +135,22 @@ class Search(Base):
     # Status
     status = Column(String(20), default="pending")  # pending, running, complete, error
     error = Column(Text, nullable=True)
+
+    # Search depth tracking
+    config_name = Column(String(50), default="standard")  # quick, standard, deep, exhaustive
+    api_calls_made = Column(Integer, default=0)
+    api_calls_budget = Column(Integer, default=5)
+    actual_cost_cents = Column(Integer, default=0)
+
+    # Expansion tracking
+    queries_searched = Column(JSON, default=[])  # All query variations used
+    locations_searched = Column(JSON, default=[])  # All locations searched
+    pages_fetched = Column(JSON, default={})  # {"organic": [1,2,3], "maps": [1]}
+
+    # Results by source
+    results_from_organic = Column(Integer, default=0)
+    results_from_maps = Column(Integer, default=0)
+    results_from_ads = Column(Integer, default=0)
 
     # Relationships
     campaign = relationship("Campaign", back_populates="searches")
@@ -224,9 +278,103 @@ class ExportHistory(Base):
     sheet_url = Column(String(500), nullable=True)
 
 
+def seed_search_configs(db: Session) -> None:
+    """Seed default search configurations."""
+    configs = [
+        {
+            "name": "quick",
+            "description": "Fast scan - first page only",
+            "organic_pages": 1,
+            "maps_pages": 0,
+            "use_query_variations": False,
+            "use_location_expansion": False,
+            "search_organic": True,
+            "search_maps": True,
+            "search_local_services": False,
+            "max_api_calls": 1,
+            "estimated_cost_cents": 1,
+        },
+        {
+            "name": "standard",
+            "description": "Balanced search - good coverage",
+            "organic_pages": 2,
+            "maps_pages": 1,
+            "use_query_variations": True,
+            "query_variations": ["{business_type} services", "{business_type} near me"],
+            "use_location_expansion": False,
+            "search_organic": True,
+            "search_maps": True,
+            "search_local_services": False,
+            "max_api_calls": 5,
+            "estimated_cost_cents": 5,
+        },
+        {
+            "name": "deep",
+            "description": "Comprehensive - multiple queries and locations",
+            "organic_pages": 3,
+            "maps_pages": 2,
+            "use_query_variations": True,
+            "query_variations": [
+                "{business_type} services",
+                "{business_type} near me",
+                "best {business_type}",
+                "local {business_type}",
+            ],
+            "use_location_expansion": True,
+            "expansion_radius_km": 10,
+            "max_locations": 5,
+            "search_organic": True,
+            "search_maps": True,
+            "search_local_services": True,
+            "max_api_calls": 20,
+            "estimated_cost_cents": 15,
+        },
+        {
+            "name": "exhaustive",
+            "description": "Full market mapping - maximum coverage",
+            "organic_pages": 5,
+            "maps_pages": 3,
+            "use_query_variations": True,
+            "query_variations": [
+                "{business_type} services",
+                "{business_type} near me",
+                "best {business_type}",
+                "local {business_type}",
+                "emergency {business_type}",
+                "cheap {business_type}",
+                "24 hour {business_type}",
+                "{business_type} company",
+            ],
+            "use_location_expansion": True,
+            "expansion_radius_km": 25,
+            "max_locations": 10,
+            "search_organic": True,
+            "search_maps": True,
+            "search_local_services": True,
+            "max_api_calls": 50,
+            "estimated_cost_cents": 40,
+        },
+    ]
+
+    for config in configs:
+        existing = db.query(SearchConfig).filter(SearchConfig.name == config["name"]).first()
+        if not existing:
+            db.add(SearchConfig(**config))
+
+    db.commit()
+    logger.debug("Search configs seeded")
+
+
 def init_db():
-    """Initialize database tables."""
+    """Initialize database tables and seed data."""
     Base.metadata.create_all(bind=engine)
+
+    # Seed search configs
+    db = SessionLocal()
+    try:
+        seed_search_configs(db)
+    finally:
+        db.close()
 
 
 def get_db() -> Generator[Session, None, None]:

@@ -1,7 +1,16 @@
 """Pydantic models for API v1."""
 
-from typing import List
+from typing import List, Optional
+from enum import Enum
 from pydantic import BaseModel, ConfigDict, Field
+
+
+class SearchDepth(str, Enum):
+    """Search depth tier."""
+    quick = "quick"
+    standard = "standard"
+    deep = "deep"
+    exhaustive = "exhaustive"
 
 
 class Filters(BaseModel):
@@ -28,6 +37,7 @@ class SearchRequest(BaseModel):
                 "business_type": "buyer's agent",
                 "location": "Brisbane, QLD",
                 "limit": 20,
+                "depth": "standard",
                 "skip_enrichment": False,
                 "parallel": 3,
                 "filters": {
@@ -40,7 +50,8 @@ class SearchRequest(BaseModel):
 
     business_type: str
     location: str
-    limit: int = Field(default=20, le=100, ge=1)
+    limit: int = Field(default=20, le=200, ge=1)
+    depth: SearchDepth = SearchDepth.standard
     skip_enrichment: bool = False
     parallel: int = Field(default=3, le=10, ge=1)
     filters: Filters = Field(default_factory=Filters)
@@ -52,3 +63,23 @@ class JobResponse(BaseModel):
     id: str
     status: str
     message: str
+    depth: Optional[str] = None
+
+
+class SearchEstimate(BaseModel):
+    """Search estimate response."""
+    queries: List[str]
+    locations: List[str]
+    total_api_calls: int
+    estimated_cost_cents: int
+    estimated_prospects: str
+    warning: Optional[str] = None
+
+
+class SearchConfigResponse(BaseModel):
+    """Search configuration info."""
+    name: str
+    description: str
+    estimated_cost_cents: int
+    max_api_calls: int
+    estimated_prospects: str

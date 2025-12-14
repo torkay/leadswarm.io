@@ -89,7 +89,19 @@
         .status-skipped { background: rgba(113, 113, 122, 0.15); color: #a1a1aa; }
 
         /* Hover states */
-        .hover-row:hover { background: var(--bg-tertiary); }
+        .hover-row {
+            transition: background 0.15s ease;
+            cursor: pointer;
+        }
+        .hover-row:hover {
+            background: var(--bg-tertiary);
+        }
+        .hover-row:active {
+            background: var(--border);
+        }
+        .hover-row td {
+            border-bottom: 1px solid var(--border);
+        }
 
         /* Command palette */
         .cmd-palette {
@@ -496,6 +508,349 @@
 
         .input-field::placeholder {
             color: var(--text-muted);
+        }
+
+        /* ============================================
+           DEPTH SLIDER COMPONENT
+           ============================================ */
+
+        .depth-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .depth-header label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+
+        .btn-ghost:hover {
+            color: var(--text-primary);
+        }
+
+        .btn-xs {
+            padding: 4px 8px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Slider Container */
+        .depth-slider-container {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        /* Tier Labels */
+        .depth-tier-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 0 2px;
+        }
+
+        .tier-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: color 0.15s, transform 0.15s;
+        }
+
+        .tier-label.active {
+            color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        /* Slider Track */
+        .depth-slider-track {
+            position: relative;
+            height: 32px;
+            margin-bottom: 16px;
+        }
+
+        .depth-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            outline: none;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        /* Slider Fill (progress) */
+        .depth-slider-fill {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 0;
+            height: 8px;
+            background: linear-gradient(90deg, var(--accent) 0%, #22c55e 50%, #f59e0b 100%);
+            border-radius: 4px;
+            pointer-events: none;
+            z-index: 1;
+            transition: width 0.1s ease;
+        }
+
+        /* Slider Stops (tick marks) */
+        .depth-slider-stops {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 2px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .slider-stop {
+            width: 12px;
+            height: 12px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        .slider-stop.passed {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* Slider Thumb */
+        .depth-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: grab;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .depth-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .depth-slider::-webkit-slider-thumb:active {
+            cursor: grabbing;
+            transform: scale(1.15);
+        }
+
+        .depth-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: grab;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Quick Stats Row */
+        .depth-quick-stats {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .depth-stat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 8px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            transition: background 0.15s;
+        }
+
+        .depth-stat.highlight {
+            background: var(--accent-muted);
+        }
+
+        .depth-stat-icon {
+            width: 18px;
+            height: 18px;
+            color: var(--text-muted);
+        }
+
+        .depth-stat.highlight .depth-stat-icon {
+            color: var(--accent);
+        }
+
+        .depth-stat-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .depth-stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Expandable Details Panel */
+        .depth-details-panel {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .depth-details-panel.open {
+            display: block;
+            animation: slideDown 0.2s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .depth-details-section {
+            margin-bottom: 16px;
+        }
+
+        .depth-details-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .depth-details-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .depth-details-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        /* Query/Location Chips */
+        .query-chip,
+        .location-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .query-chip {
+            border-color: rgba(96, 165, 250, 0.3);
+            color: #60a5fa;
+        }
+
+        .location-chip {
+            border-color: rgba(74, 222, 128, 0.3);
+            color: #4ade80;
+        }
+
+        /* Source Chips */
+        .source-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 12px;
+            transition: opacity 0.15s;
+        }
+
+        .source-chip.active {
+            background: var(--accent-muted);
+            color: var(--accent);
+        }
+
+        .source-chip.inactive {
+            background: var(--bg-secondary);
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        /* Breakdown Table */
+        .depth-details-breakdown {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-top: 16px;
+        }
+
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 12px;
+        }
+
+        .breakdown-row span:first-child {
+            color: var(--text-muted);
+        }
+
+        .breakdown-row span:last-child {
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 640px) {
+            .depth-quick-stats {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tier-label {
+                font-size: 10px;
+            }
+
+            .depth-slider::-webkit-slider-thumb {
+                width: 28px;
+                height: 28px;
+            }
         }
 
         /* Button */
@@ -1289,8 +1644,8 @@
                 </div>
             </div>
 
-            <!-- Pipeline section - hide if no prospects -->
-            <div id="pipeline-section" style="display: none;">
+            <!-- Pipeline section - always visible -->
+            <div id="pipeline-section">
                 <div class="px-4 mt-6 mb-2 text-xs font-medium text-zinc-500 uppercase tracking-wider">Pipeline</div>
 
                 <div class="sidebar-item" data-page="prospects" data-filter="status=new">
@@ -1491,7 +1846,7 @@
         const STRINGS = {
             // Actions
             analyse: 'Analyse',
-            analysing: 'Analysing...',
+            analysing: 'Searching...',
             analysed: 'Analysed',
             // Progress
             searchingFor: 'Searching for',
@@ -1961,9 +2316,140 @@
                                 <div class="text-xs text-zinc-500 mt-1">City, suburb, or region to search</div>
                             </div>
 
-                            <div>
-                                <label class="block text-sm font-medium mb-2">Max Results</label>
-                                <input type="number" name="limit" value="20" min="1" max="100" class="input-field w-32">
+                            <!-- Search Depth - Slider Design -->
+                            <div class="form-group">
+                                <div class="depth-header">
+                                    <label>Search Depth</label>
+                                    <button type="button" class="btn-ghost btn-xs" onclick="toggleDepthDetails()" id="depth-details-toggle">
+                                        <i data-lucide="info" style="width: 14px; height: 14px;"></i>
+                                        <span>What's included?</span>
+                                    </button>
+                                </div>
+
+                                <!-- Slider Container -->
+                                <div class="depth-slider-container">
+                                    <!-- Tier Labels -->
+                                    <div class="depth-tier-labels">
+                                        <span class="tier-label" data-tier="quick">Quick</span>
+                                        <span class="tier-label active" data-tier="standard">Standard</span>
+                                        <span class="tier-label" data-tier="deep">Deep</span>
+                                        <span class="tier-label" data-tier="exhaustive">Exhaustive</span>
+                                    </div>
+
+                                    <!-- Slider Track -->
+                                    <div class="depth-slider-track">
+                                        <div class="depth-slider-fill" id="depth-slider-fill" style="width: 33%"></div>
+                                        <div class="depth-slider-stops">
+                                            <div class="slider-stop passed" data-value="0"></div>
+                                            <div class="slider-stop passed" data-value="33"></div>
+                                            <div class="slider-stop" data-value="66"></div>
+                                            <div class="slider-stop" data-value="100"></div>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            id="depth-slider"
+                                            min="0"
+                                            max="100"
+                                            value="33"
+                                            class="depth-slider"
+                                            oninput="handleDepthSliderChange(this.value)"
+                                        >
+                                    </div>
+
+                                    <!-- Quick Stats Row -->
+                                    <div class="depth-quick-stats">
+                                        <div class="depth-stat">
+                                            <i data-lucide="users" class="depth-stat-icon"></i>
+                                            <span class="depth-stat-value" id="depth-prospects">20-40</span>
+                                            <span class="depth-stat-label">prospects</span>
+                                        </div>
+                                        <div class="depth-stat">
+                                            <i data-lucide="zap" class="depth-stat-icon"></i>
+                                            <span class="depth-stat-value" id="depth-api-calls">5</span>
+                                            <span class="depth-stat-label">API calls</span>
+                                        </div>
+                                        <div class="depth-stat">
+                                            <i data-lucide="clock" class="depth-stat-icon"></i>
+                                            <span class="depth-stat-value" id="depth-time">~15s</span>
+                                            <span class="depth-stat-label">estimated</span>
+                                        </div>
+                                        <div class="depth-stat highlight">
+                                            <i data-lucide="coins" class="depth-stat-icon"></i>
+                                            <span class="depth-stat-value" id="depth-cost">$0.05</span>
+                                            <span class="depth-stat-label">cost</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Expandable Details Panel -->
+                                <div class="depth-details-panel" id="depth-details-panel">
+                                    <div class="depth-details-section">
+                                        <div class="depth-details-title">
+                                            <i data-lucide="search" style="width: 14px; height: 14px;"></i>
+                                            Queries to search
+                                        </div>
+                                        <div class="depth-details-content" id="depth-queries-preview">
+                                            <span class="query-chip">plumber</span>
+                                            <span class="query-chip">plumber services</span>
+                                            <span class="query-chip">plumber near me</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="depth-details-section">
+                                        <div class="depth-details-title">
+                                            <i data-lucide="map-pin" style="width: 14px; height: 14px;"></i>
+                                            Locations to search
+                                        </div>
+                                        <div class="depth-details-content" id="depth-locations-preview">
+                                            <span class="location-chip">Brisbane</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="depth-details-section">
+                                        <div class="depth-details-title">
+                                            <i data-lucide="layers" style="width: 14px; height: 14px;"></i>
+                                            Search sources
+                                        </div>
+                                        <div class="depth-details-content" id="depth-sources-preview">
+                                            <span class="source-chip active">
+                                                <i data-lucide="search" style="width: 12px; height: 12px;"></i>
+                                                Organic
+                                            </span>
+                                            <span class="source-chip active">
+                                                <i data-lucide="map" style="width: 12px; height: 12px;"></i>
+                                                Maps
+                                            </span>
+                                            <span class="source-chip inactive">
+                                                <i data-lucide="shield-check" style="width: 12px; height: 12px;"></i>
+                                                Local Services
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="depth-details-breakdown">
+                                        <div class="breakdown-row">
+                                            <span>Organic pages</span>
+                                            <span id="depth-organic-pages">2</span>
+                                        </div>
+                                        <div class="breakdown-row">
+                                            <span>Maps pages</span>
+                                            <span id="depth-maps-pages">1</span>
+                                        </div>
+                                        <div class="breakdown-row">
+                                            <span>Query variations</span>
+                                            <span id="depth-query-count">3</span>
+                                        </div>
+                                        <div class="breakdown-row">
+                                            <span>Location expansion</span>
+                                            <span id="depth-location-count">1</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Hidden input for form submission -->
+                                <input type="hidden" id="search-depth" name="depth" value="standard">
+                                <!-- Hidden limit value - determined by depth tier -->
+                                <input type="hidden" id="search-limit" name="limit" value="50">
                             </div>
 
                             <div class="flex items-center gap-4">
@@ -1973,7 +2459,7 @@
                                 </label>
                             </div>
 
-                            <div class="flex gap-3">
+                            <div class="flex gap-3 flex-wrap">
                                 <button type="submit" class="btn-primary" id="search-submit-btn">
                                     <i data-lucide="search" class="w-4 h-4"></i>
                                     Find Prospects
@@ -1993,19 +2479,21 @@
                                 <i data-lucide="loader-2" class="w-4 h-4 text-green-400 animate-spin"></i>
                             </div>
                             <div>
-                                <div id="progress-title" class="font-medium">Analysing...</div>
+                                <div id="progress-title" class="font-medium">Searching...</div>
                                 <div id="progress-subtitle" class="text-sm text-zinc-500">Finding prospects</div>
                             </div>
                         </div>
                         <div class="h-2 bg-zinc-800 rounded-full overflow-hidden">
                             <div id="progress-bar" class="h-full bg-green-500 transition-all" style="width: 0%"></div>
                         </div>
+                        <div id="progress-details" class="mt-2 text-xs text-zinc-500"></div>
                     </div>
                 </div>
             `;
 
             lucide.createIcons();
             document.getElementById('search-form').addEventListener('submit', handleSearch);
+            initDepthSelector();
         }
 
         async function handleQuickSearch(e) {
@@ -2026,6 +2514,345 @@
             }, 100);
         }
 
+        // ============================================
+        // DEPTH SLIDER CONTROLLER
+        // ============================================
+
+        const DEPTH_TIERS = {
+            quick: {
+                value: 0,
+                name: 'quick',
+                prospects: '5-15',
+                apiCalls: 1,
+                time: '~5s',
+                cost: 0.01,
+                limit: 20,
+                queries: ['{business_type}'],
+                locations: 1,
+                organicPages: 1,
+                mapsPages: 0,
+                localServices: false,
+            },
+            standard: {
+                value: 33,
+                name: 'standard',
+                prospects: '20-40',
+                apiCalls: 5,
+                time: '~15s',
+                cost: 0.05,
+                limit: 50,
+                queries: ['{business_type}', '{business_type} services', '{business_type} near me'],
+                locations: 1,
+                organicPages: 2,
+                mapsPages: 1,
+                localServices: false,
+            },
+            deep: {
+                value: 66,
+                name: 'deep',
+                prospects: '50-100',
+                apiCalls: 20,
+                time: '~45s',
+                cost: 0.15,
+                limit: 100,
+                queries: [
+                    '{business_type}',
+                    '{business_type} services',
+                    '{business_type} near me',
+                    'best {business_type}',
+                    'local {business_type}',
+                ],
+                locations: 5,
+                organicPages: 3,
+                mapsPages: 2,
+                localServices: true,
+            },
+            exhaustive: {
+                value: 100,
+                name: 'exhaustive',
+                prospects: '100-200+',
+                apiCalls: 50,
+                time: '~2min',
+                cost: 0.40,
+                limit: 200,
+                queries: [
+                    '{business_type}',
+                    '{business_type} services',
+                    '{business_type} near me',
+                    'best {business_type}',
+                    'local {business_type}',
+                    'emergency {business_type}',
+                    'cheap {business_type}',
+                    '24 hour {business_type}',
+                ],
+                locations: 10,
+                organicPages: 5,
+                mapsPages: 3,
+                localServices: true,
+            },
+        };
+
+        let currentDepthTier = 'standard';
+        let selectedDepth = 'standard'; // Keep for backwards compatibility
+        let depthDetailsOpen = false;
+
+        function initDepthSelector() {
+            const slider = document.getElementById('depth-slider');
+            if (!slider) return;
+
+            // Set initial value
+            slider.value = DEPTH_TIERS.standard.value;
+            updateDepthUI(DEPTH_TIERS.standard.value);
+
+            // Add snap-to-tier behavior on mouse up
+            slider.addEventListener('change', () => {
+                snapToNearestTier(slider.value);
+            });
+
+            // Live preview on drag
+            slider.addEventListener('input', () => {
+                updateDepthUI(slider.value);
+            });
+
+            // Update details when business type or location changes
+            const businessTypeInput = document.querySelector('[name="business_type"]');
+            const locationInput = document.querySelector('[name="location"]');
+
+            if (businessTypeInput) {
+                businessTypeInput.addEventListener('input', debounce(() => {
+                    if (depthDetailsOpen) {
+                        const tier = getTierForValue(document.getElementById('depth-slider').value);
+                        updateDepthDetails(tier);
+                    }
+                }, 300));
+            }
+
+            if (locationInput) {
+                locationInput.addEventListener('input', debounce(() => {
+                    if (depthDetailsOpen) {
+                        const tier = getTierForValue(document.getElementById('depth-slider').value);
+                        updateDepthDetails(tier);
+                    }
+                }, 300));
+            }
+        }
+
+        function debounce(fn, delay) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
+
+        function handleDepthSliderChange(value) {
+            updateDepthUI(value);
+        }
+
+        function snapToNearestTier(value) {
+            const slider = document.getElementById('depth-slider');
+
+            // Find nearest tier
+            let nearestTier = 'quick';
+            let nearestDistance = Math.abs(value - DEPTH_TIERS.quick.value);
+
+            for (const [name, tier] of Object.entries(DEPTH_TIERS)) {
+                const distance = Math.abs(value - tier.value);
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearestTier = name;
+                }
+            }
+
+            // Animate to snapped position
+            const targetValue = DEPTH_TIERS[nearestTier].value;
+            animateSlider(slider, parseInt(value), targetValue);
+
+            currentDepthTier = nearestTier;
+            selectedDepth = nearestTier;
+            document.getElementById('search-depth').value = nearestTier;
+            document.getElementById('search-limit').value = DEPTH_TIERS[nearestTier].limit;
+        }
+
+        function animateSlider(slider, from, to) {
+            const duration = 150;
+            const start = performance.now();
+
+            function animate(currentTime) {
+                const elapsed = currentTime - start;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Ease out cubic
+                const eased = 1 - Math.pow(1 - progress, 3);
+
+                const currentValue = from + (to - from) * eased;
+                slider.value = currentValue;
+                updateDepthUI(currentValue);
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        function updateDepthUI(value) {
+            value = parseInt(value);
+
+            // Update slider fill
+            const fill = document.getElementById('depth-slider-fill');
+            if (fill) fill.style.width = `${value}%`;
+
+            // Update stop markers
+            document.querySelectorAll('.slider-stop').forEach(stop => {
+                const stopValue = parseInt(stop.dataset.value);
+                stop.classList.toggle('passed', value >= stopValue);
+            });
+
+            // Find current tier (or interpolate)
+            const tier = getTierForValue(value);
+
+            // Update tier labels
+            document.querySelectorAll('.tier-label').forEach(label => {
+                const labelTier = label.dataset.tier;
+                label.classList.toggle('active', labelTier === tier.name);
+            });
+
+            // Update stats
+            const prospectsEl = document.getElementById('depth-prospects');
+            const apiCallsEl = document.getElementById('depth-api-calls');
+            const timeEl = document.getElementById('depth-time');
+            const costEl = document.getElementById('depth-cost');
+
+            if (prospectsEl) prospectsEl.textContent = tier.prospects;
+            if (apiCallsEl) apiCallsEl.textContent = tier.apiCalls;
+            if (timeEl) timeEl.textContent = tier.time;
+            if (costEl) costEl.textContent = `$${tier.cost.toFixed(2)}`;
+
+            // Update details panel if open
+            if (depthDetailsOpen) {
+                updateDepthDetails(tier);
+            }
+        }
+
+        function getTierForValue(value) {
+            // Snap to nearest tier
+            if (value < 17) return DEPTH_TIERS.quick;
+            if (value < 50) return DEPTH_TIERS.standard;
+            if (value < 83) return DEPTH_TIERS.deep;
+            return DEPTH_TIERS.exhaustive;
+        }
+
+        function toggleDepthDetails() {
+            depthDetailsOpen = !depthDetailsOpen;
+
+            const panel = document.getElementById('depth-details-panel');
+            const toggle = document.getElementById('depth-details-toggle');
+
+            if (panel) panel.classList.toggle('open', depthDetailsOpen);
+            if (toggle) {
+                const span = toggle.querySelector('span');
+                if (span) span.textContent = depthDetailsOpen ? 'Hide details' : "What's included?";
+            }
+
+            if (depthDetailsOpen) {
+                const tier = getTierForValue(document.getElementById('depth-slider').value);
+                updateDepthDetails(tier);
+                lucide.createIcons();
+            }
+        }
+
+        function updateDepthDetails(tier) {
+            const businessType = document.querySelector('[name="business_type"]')?.value || 'plumber';
+            const location = document.querySelector('[name="location"]')?.value || 'Brisbane';
+
+            // Update queries preview
+            const queriesContainer = document.getElementById('depth-queries-preview');
+            if (queriesContainer) {
+                queriesContainer.innerHTML = tier.queries.map(q => {
+                    const expanded = q.replace('{business_type}', businessType);
+                    return `<span class="query-chip">${escapeHtml(expanded)}</span>`;
+                }).join('');
+            }
+
+            // Update locations preview
+            const locationsContainer = document.getElementById('depth-locations-preview');
+            if (locationsContainer) {
+                if (tier.locations === 1) {
+                    locationsContainer.innerHTML = `<span class="location-chip">${escapeHtml(location)}</span>`;
+                } else {
+                    const expandedLocations = getExampleLocations(location, tier.locations);
+                    locationsContainer.innerHTML = expandedLocations.map(loc =>
+                        `<span class="location-chip">${escapeHtml(loc)}</span>`
+                    ).join('');
+                }
+            }
+
+            // Update sources
+            const sourcesContainer = document.getElementById('depth-sources-preview');
+            if (sourcesContainer) {
+                sourcesContainer.innerHTML = `
+                    <span class="source-chip active">
+                        <i data-lucide="search" style="width: 12px; height: 12px;"></i>
+                        Organic
+                    </span>
+                    <span class="source-chip ${tier.mapsPages > 0 ? 'active' : 'inactive'}">
+                        <i data-lucide="map" style="width: 12px; height: 12px;"></i>
+                        Maps
+                    </span>
+                    <span class="source-chip ${tier.localServices ? 'active' : 'inactive'}">
+                        <i data-lucide="shield-check" style="width: 12px; height: 12px;"></i>
+                        Local Services
+                    </span>
+                `;
+            }
+
+            // Update breakdown
+            const organicPagesEl = document.getElementById('depth-organic-pages');
+            const mapsPagesEl = document.getElementById('depth-maps-pages');
+            const queryCountEl = document.getElementById('depth-query-count');
+            const locationCountEl = document.getElementById('depth-location-count');
+
+            if (organicPagesEl) organicPagesEl.textContent = tier.organicPages;
+            if (mapsPagesEl) mapsPagesEl.textContent = tier.mapsPages;
+            if (queryCountEl) queryCountEl.textContent = tier.queries.length;
+            if (locationCountEl) locationCountEl.textContent = tier.locations;
+
+            // Re-render icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        function getExampleLocations(baseLocation, count) {
+            const locationLower = baseLocation.toLowerCase();
+
+            const expansions = {
+                'brisbane': ['Brisbane CBD', 'Fortitude Valley', 'South Brisbane', 'West End', 'New Farm', 'Paddington', 'Milton', 'Woolloongabba', 'Kangaroo Point', 'Newstead'],
+                'sydney': ['Sydney CBD', 'Surry Hills', 'Newtown', 'Bondi', 'Parramatta', 'North Sydney', 'Manly', 'Chatswood', 'Glebe', 'Pyrmont'],
+                'melbourne': ['Melbourne CBD', 'South Yarra', 'Fitzroy', 'Richmond', 'St Kilda', 'Carlton', 'Collingwood', 'Brunswick', 'Prahran', 'Docklands'],
+                'gold coast': ['Surfers Paradise', 'Broadbeach', 'Southport', 'Burleigh Heads', 'Main Beach', 'Robina', 'Coolangatta', 'Nerang'],
+                'perth': ['Perth CBD', 'Fremantle', 'Subiaco', 'Northbridge', 'Leederville', 'Victoria Park', 'Mount Lawley', 'Claremont'],
+                'adelaide': ['Adelaide CBD', 'North Adelaide', 'Glenelg', 'Norwood', 'Unley', 'Prospect', 'Henley Beach', 'Brighton'],
+            };
+
+            for (const [city, suburbs] of Object.entries(expansions)) {
+                if (locationLower.includes(city)) {
+                    return suburbs.slice(0, count);
+                }
+            }
+
+            // Default: just return the base location
+            return [baseLocation];
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         async function handleSearch(e) {
             e.preventDefault();
             const form = e.target;
@@ -2034,12 +2861,14 @@
             const request = {
                 business_type: formData.get('business_type'),
                 location: formData.get('location'),
-                limit: parseInt(formData.get('limit')) || 20,
+                limit: parseInt(formData.get('limit')) || 50,
+                depth: formData.get('depth') || selectedDepth,
                 skip_enrichment: formData.get('skip_enrichment') === 'on',
             };
 
             // Show progress
             document.getElementById('search-progress').classList.remove('hidden');
+            document.getElementById('progress-details').textContent = `Depth: ${request.depth}`;
             const submitBtn = document.getElementById('search-submit-btn');
             submitBtn.disabled = true;
 
@@ -2470,11 +3299,7 @@
                         ` : ''}
                     </div>
 
-                    ${p.opportunity_notes ? `
-                        <div class="prospect-card-notes">
-                            ${escapeHtml(smartTruncate(p.opportunity_notes, 100))}
-                        </div>
-                    ` : ''}
+                    ${p.opportunity_notes ? `<div class="prospect-card-notes">${escapeHtml(smartTruncate(p.opportunity_notes, 100))}</div>` : ''}
 
                     <div class="prospect-card-footer">
                         <span class="prospect-card-status status-${p.status}">
@@ -2535,12 +3360,6 @@
                     document.getElementById('pipeline-new').textContent = stats.status_breakdown.new || 0;
                     document.getElementById('pipeline-qualified').textContent = stats.status_breakdown.qualified || 0;
                     document.getElementById('pipeline-contacted').textContent = stats.status_breakdown.contacted || 0;
-                }
-
-                // Show/hide Pipeline section based on prospect count
-                const pipelineSection = document.getElementById('pipeline-section');
-                if (pipelineSection) {
-                    pipelineSection.style.display = hasProspects ? 'block' : 'none';
                 }
 
                 // Update mobile elements
@@ -2622,9 +3441,7 @@
                     <!-- Opportunity Notes - FULL TEXT -->
                     <div class="detail-section">
                         <div class="detail-section-title">Opportunity Notes</div>
-                        <div class="detail-notes">
-                            ${escapeHtml(prospect.opportunity_notes) || 'No automated notes available.'}
-                        </div>
+                        <div class="detail-notes">${escapeHtml(prospect.opportunity_notes) || 'No automated notes available.'}</div>
                     </div>
 
                     <!-- SERP Presence with icons -->

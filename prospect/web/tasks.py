@@ -20,6 +20,7 @@ async def run_search_task(job_id: str, request: SearchRequest):
     try:
         # Import scraper components
         from prospect.scraper.serpapi import SerpAPIClient, AuthenticationError
+        from prospect.scraper.orchestrator import SearchOrchestrator
         from prospect.dedup import deduplicate_serp_results
         from prospect.enrichment.crawler import WebsiteCrawler
         from prospect.scoring import (
@@ -32,6 +33,7 @@ async def run_search_task(job_id: str, request: SearchRequest):
         # Extract config
         filters = request.filters
         scoring = request.scoring
+        search_config = job.config.get("search_config") if job.config else None
 
         # Phase 1: Search
         await job_manager.update_job(
@@ -40,32 +42,84 @@ async def run_search_task(job_id: str, request: SearchRequest):
             progress_message="Searching Google..."
         )
 
-        # Use SerpAPI
-        try:
-            client = SerpAPIClient()
-            serp_results = client.search(
-                request.business_type,
-                request.location,
-                request.limit
-            )
-            client.close()
-        except AuthenticationError as e:
-            await job_manager.update_job(
-                job_id,
-                status=JobStatus.ERROR,
-                error=f"SerpAPI not configured: {e}"
-            )
-            return
-        except Exception as e:
-            await job_manager.update_job(
-                job_id,
-                status=JobStatus.ERROR,
-                error=f"Search failed: {e}"
-            )
-            return
+        # Use orchestrator for tiered search if config available
+        if search_config and request.depth.value != "quick":
+            # Use orchestrator for standard/deep/exhaustive
+            try:
+                orchestrator = SearchOrchestrator()
+                prospects = []
 
-        # Deduplicate (pass location for phone validation)
-        prospects = deduplicate_serp_results(serp_results, location=request.location)
+                async for progress in orchestrator.execute_search(
+                    business_type=request.business_type,
+                    location=request.location,
+                    config=search_config,
+                ):
+                    # Update job progress
+                    if progress.phase == "searching":
+                        msg = f"Searching: {progress.current_query}"
+                        if progress.current_location != request.location:
+                            msg += f" in {progress.current_location}"
+                        if progress.current_page > 1:
+                            msg += f" (page {progress.current_page})"
+
+                        await job_manager.update_job(
+                            job_id,
+                            progress_message=msg,
+                            progress=progress.completed_api_calls,
+                            progress_total=progress.total_api_calls,
+                        )
+                    elif progress.phase == "deduplicating":
+                        await job_manager.update_job(
+                            job_id,
+                            progress_message=f"Deduplicating {progress.total_prospects} results..."
+                        )
+                    elif progress.phase == "complete":
+                        prospects = progress.results
+
+                orchestrator.close()
+
+            except AuthenticationError as e:
+                await job_manager.update_job(
+                    job_id,
+                    status=JobStatus.ERROR,
+                    error=f"SerpAPI not configured: {e}"
+                )
+                return
+            except Exception as e:
+                logger.exception("Orchestrator search failed")
+                await job_manager.update_job(
+                    job_id,
+                    status=JobStatus.ERROR,
+                    error=f"Search failed: {e}"
+                )
+                return
+        else:
+            # Use simple SerpAPI for quick search
+            try:
+                client = SerpAPIClient()
+                serp_results = client.search(
+                    request.business_type,
+                    request.location,
+                    request.limit
+                )
+                client.close()
+            except AuthenticationError as e:
+                await job_manager.update_job(
+                    job_id,
+                    status=JobStatus.ERROR,
+                    error=f"SerpAPI not configured: {e}"
+                )
+                return
+            except Exception as e:
+                await job_manager.update_job(
+                    job_id,
+                    status=JobStatus.ERROR,
+                    error=f"Search failed: {e}"
+                )
+                return
+
+            # Deduplicate (pass location for phone validation)
+            prospects = deduplicate_serp_results(serp_results, location=request.location)
 
         # Apply domain exclusions
         if filters.exclude_domains:
@@ -99,7 +153,7 @@ async def run_search_task(job_id: str, request: SearchRequest):
                 job_id,
                 status=JobStatus.ENRICHING,
                 progress=0,
-                progress_message="Analyzing websites..."
+                progress_message="Analysing websites..."
             )
 
             config = ScraperConfig()
@@ -110,7 +164,7 @@ async def run_search_task(job_id: str, request: SearchRequest):
                     await job_manager.update_job(
                         job_id,
                         progress=i + 1,
-                        progress_message=f"Analyzing {prospect.name[:30]}..."
+                        progress_message=f"Analysing {prospect.name[:30]}..."
                     )
 
                     # Enrich

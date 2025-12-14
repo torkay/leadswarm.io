@@ -252,7 +252,7 @@ async def run_search_job(job_id: str):
             job_id,
             status=JobStatus.ENRICHING,
             progress=0,
-            progress_message="Analyzing websites..."
+            progress_message="Analysing websites..."
         )
 
         config = ScraperConfig()
@@ -263,7 +263,7 @@ async def run_search_job(job_id: str):
                 await job_manager.update_job(
                     job_id,
                     progress=i + 1,
-                    progress_message=f"Analyzing {prospect.name[:30]}..."
+                    progress_message=f"Analysing {prospect.name[:30]}..."
                 )
 
                 # Enrich

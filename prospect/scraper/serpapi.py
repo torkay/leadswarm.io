@@ -315,6 +315,186 @@ class SerpAPIClient:
 
         return results
 
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=4, max=60),
+        retry=retry_if_exception_type(RateLimitError)
+    )
+    def search_paginated(
+        self,
+        business_type: str,
+        location: str,
+        page: int = 1,
+        num_results: int = 10
+    ) -> SerpResults:
+        """
+        Search Google for businesses with pagination support.
+
+        Args:
+            business_type: Type of business (e.g., "buyer's agent")
+            location: Location to search (e.g., "Brisbane, QLD")
+            page: Page number (1-indexed)
+            num_results: Results per page (max 10 for reliable pagination)
+
+        Returns:
+            SerpResults with ads, maps, and organic listings
+        """
+        normalized_location = normalize_au_location(location)
+        query = f"{business_type} {location}"
+        start = (page - 1) * num_results
+
+        logger.debug("Location normalized: '%s' -> '%s' (page %d)", location, normalized_location, page)
+
+        params = {
+            "api_key": self.api_key,
+            "engine": "google",
+            "q": query,
+            "location": normalized_location,
+            "google_domain": self.google_domain,
+            "gl": self.gl,
+            "hl": self.hl,
+            "num": num_results,
+            "start": start,
+        }
+
+        logger.info("SerpAPI paginated search: %s (page %d)", query, page)
+
+        response = self._client.get(self.base_url, params=params)
+        self._handle_errors(response)
+
+        data = response.json()
+        results = self._parse_response(data, query, location)
+
+        logger.info(
+            "SerpAPI page %d returned: %d ads, %d maps, %d organic",
+            page,
+            len(results.ads),
+            len(results.maps),
+            len(results.organic),
+        )
+
+        return results
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=4, max=60),
+        retry=retry_if_exception_type(RateLimitError)
+    )
+    def search_maps(
+        self,
+        business_type: str,
+        location: str,
+        start: int = 0
+    ) -> list[MapsResult]:
+        """
+        Search Google Maps for local businesses.
+
+        Args:
+            business_type: Type of business
+            location: Location to search
+            start: Starting offset for pagination
+
+        Returns:
+            List of MapsResult objects
+        """
+        from .locations import location_to_coords
+
+        query = f"{business_type} {location}"
+        coords = location_to_coords(location)
+
+        params = {
+            "api_key": self.api_key,
+            "engine": "google_maps",
+            "q": query,
+            "ll": coords,
+            "type": "search",
+            "start": start,
+        }
+
+        logger.info("SerpAPI Maps search: %s (start=%d)", query, start)
+
+        response = self._client.get(self.base_url, params=params)
+        self._handle_errors(response)
+
+        data = response.json()
+
+        results = []
+        for item in data.get("local_results", []):
+            try:
+                results.append(MapsResult(
+                    position=item.get("position", len(results) + 1),
+                    name=item.get("title", "Unknown"),
+                    rating=item.get("rating"),
+                    review_count=item.get("reviews"),
+                    category=item.get("type"),
+                    address=item.get("address", ""),
+                    phone=item.get("phone"),
+                    website=item.get("website"),
+                ))
+            except Exception as e:
+                logger.debug("Failed to parse maps result: %s", e)
+
+        logger.info("SerpAPI Maps returned: %d results", len(results))
+
+        return results
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=4, max=60),
+        retry=retry_if_exception_type(RateLimitError)
+    )
+    def search_local_services(
+        self,
+        business_type: str,
+        location: str
+    ) -> list[dict]:
+        """
+        Search Google Local Services (Google Guaranteed).
+
+        Args:
+            business_type: Type of business
+            location: Location to search
+
+        Returns:
+            List of local services results as dicts
+        """
+        query = f"{business_type} {location}"
+
+        params = {
+            "api_key": self.api_key,
+            "engine": "google_local_services",
+            "q": query,
+            "data_cid": "0",  # Required placeholder
+        }
+
+        logger.info("SerpAPI Local Services search: %s", query)
+
+        try:
+            response = self._client.get(self.base_url, params=params)
+            self._handle_errors(response)
+            data = response.json()
+
+            results = []
+            for item in data.get("local_ads", []):
+                results.append({
+                    "source": "local_services",
+                    "name": item.get("title"),
+                    "phone": item.get("phone"),
+                    "website": item.get("website"),
+                    "rating": item.get("rating"),
+                    "reviews": item.get("reviews"),
+                    "years_in_business": item.get("years_in_business"),
+                    "google_guaranteed": item.get("google_guaranteed", False),
+                })
+
+            logger.info("SerpAPI Local Services returned: %d results", len(results))
+            return results
+
+        except Exception as e:
+            # Local services may not be available for all locations/queries
+            logger.debug("Local Services not available: %s", e)
+            return []
+
     def close(self):
         """Close the HTTP client."""
         self._client.close()
