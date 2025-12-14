@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "prospect-scraper"
-version = "1.0.0-beta.1"
+version = "1.0.0"
 description = "Find businesses that need marketing help"
 readme = "README.md"
 license = {text = "MIT"}
