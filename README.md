@@ -2,11 +2,17 @@
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/torkay/prospect-command-center)
 
-Intelligent prospect discovery and qualification for marketing agencies.
+<div align="center">
+
+<img src="docs/assets/architecture-a3.png" alt="Prospect Command Center – System Architecture & Data Flow" width="1200" />
+
+</div>
+
+Better prospect discovery and qualification for internal marketing agent use.
 
 Prospect Command Center combines automated Google search (via SerpAPI) with website enrichment and a scoring engine to surface high‑value prospects and manage them through a simple pipeline.
 
-• Smart discovery • Intelligent scoring • Pipeline workflow • Modern web UI
+Smart discovery • Intelligent scoring • Pipeline workflow • Modern web UI
 
 ## Features
 
@@ -17,6 +23,7 @@ Prospect Command Center combines automated Google search (via SerpAPI) with webs
 - CLI for power users (batch mode, filters, multiple formats)
 - Exports to CSV/JSON/JSONL and Google Sheets
 - Docker and Railway deployment ready
+
 
 ## Quick Start
 

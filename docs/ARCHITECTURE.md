@@ -2,6 +2,8 @@
 
 ## System Overview
 
+![System Architecture & Data Flow](assets/architecture-a3.png)
+
 The Prospect Command Center is a FastAPI application with a lightweight SPA frontend. It orchestrates SerpAPI searches, website enrichment, scoring, and persistence.
 
 ```
@@ -55,4 +57,3 @@ Key entities:
 - Prospects: business core fields + signals + scores + status
 - Jobs/Searches: background job tracking and metrics
 - Campaigns: saved configurations and reruns
-

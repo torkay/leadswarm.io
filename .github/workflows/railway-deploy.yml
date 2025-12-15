@@ -7,7 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.repository_owner == 'torkay' }}
+    if: ${{ github.repository_owner == 'torkay' && secrets.RAILWAY_TOKEN != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -26,4 +26,3 @@ jobs:
           # Update variables (ensure SERPAPI_KEY is already set in Railway UI or as a secret)
           # Deploy the GHCR image to the specified service
           railway up --service "$RAILWAY_SERVICE_ID" --image "ghcr.io/${{ github.repository }}:${{ github.event.release.tag_name }}" --yes
-
