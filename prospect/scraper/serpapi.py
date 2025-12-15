@@ -257,7 +257,11 @@ class SerpAPIClient:
         return results
 
     def _parse_local_results(self, places_data: list) -> list[MapsResult]:
-        """Parse local/maps results from SerpAPI response."""
+        """
+        Parse local/maps results from SerpAPI response with GBP detection.
+
+        Andy's key signal: Good reviews + NO website on Google profile = easy sell
+        """
         results = []
 
         for i, place in enumerate(places_data):
@@ -269,15 +273,59 @@ class SerpAPIClient:
                     if isinstance(links, dict):
                         website = links.get("website")
 
+                rating = place.get("rating")
+                review_count = place.get("reviews")
+
+                # === GBP Website Detection (Andy's Methodology) ===
+                gbp_has_website = website is not None and len(str(website).strip()) > 0
+
+                # Andy's golden signal: Good business, no website linked
+                # This is the EASIEST sell - "Let me add your website to your Google profile"
+                gbp_website_missing_opportunity = (
+                    not gbp_has_website
+                    and rating is not None
+                    and float(rating) >= 4.0
+                    and review_count is not None
+                    and int(review_count) >= 5
+                )
+
+                # Calculate opportunity boost
+                gbp_opportunity_boost = 0
+                gbp_notes = []
+
+                if gbp_website_missing_opportunity:
+                    gbp_opportunity_boost = 30
+                    gbp_notes.append(
+                        f"No website on GBP despite {rating}★/{review_count} reviews - easy sell"
+                    )
+                elif not gbp_has_website:
+                    gbp_opportunity_boost = 15
+                    gbp_notes.append("No website linked to Google profile")
+
+                # Additional GBP signals
+                hours = place.get("hours") or place.get("operating_hours")
+                if not hours:
+                    gbp_opportunity_boost += 5
+                    gbp_notes.append("No hours on profile")
+
+                description = place.get("description", "")
+                if not description or len(str(description)) < 20:
+                    gbp_opportunity_boost += 3
+                    gbp_notes.append("Weak/missing business description")
+
                 results.append(MapsResult(
                     position=place.get("position", i + 1),
                     name=place.get("title", "Unknown"),
-                    rating=place.get("rating"),
-                    review_count=place.get("reviews"),
+                    rating=rating,
+                    review_count=review_count,
                     category=place.get("type"),
                     address=place.get("address", ""),
                     phone=place.get("phone"),
-                    website=website
+                    website=website,
+                    gbp_has_website=gbp_has_website,
+                    gbp_website_missing_opportunity=gbp_website_missing_opportunity,
+                    gbp_opportunity_boost=gbp_opportunity_boost,
+                    gbp_notes=gbp_notes,
                 ))
             except Exception as e:
                 logger.debug("Failed to parse local result: %s", e)

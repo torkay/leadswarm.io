@@ -1,6 +1,14 @@
 """Tests for web UI."""
 
+import os
+import tempfile
 import pytest
+
+# Set up test database before importing anything that uses it
+_test_db_file = tempfile.NamedTemporaryFile(suffix='.db', delete=False)
+_test_db_path = _test_db_file.name
+_test_db_file.close()
+os.environ["DATABASE_URL"] = f"sqlite:///{_test_db_path}"
 
 from prospect.web.app import create_app
 from prospect.web.state import JobStatus
@@ -11,8 +19,14 @@ pytest_plugins = ('pytest_asyncio',)
 
 @pytest.fixture
 def client():
-    """Create test client."""
+    """Create test client with isolated test database."""
     from fastapi.testclient import TestClient
+    from prospect.web.database import Base, engine
+
+    # Create all tables fresh for each test
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+
     app = create_app()
     return TestClient(app)
 

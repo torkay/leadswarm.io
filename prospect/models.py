@@ -30,6 +30,12 @@ class MapsResult:
     phone: Optional[str] = None
     website: Optional[str] = None
 
+    # GBP-specific detection (Andy's methodology)
+    gbp_has_website: Optional[bool] = None  # None = unknown, True/False = detected
+    gbp_website_missing_opportunity: bool = False  # Good reviews + no website = easy sell
+    gbp_opportunity_boost: int = 0  # Extra points to add to opportunity score
+    gbp_notes: list = field(default_factory=list)  # Human-readable GBP opportunity notes
+
 
 @dataclass
 class OrganicResult:
@@ -52,6 +58,52 @@ class SerpResults:
     ads: list[AdResult] = field(default_factory=list)
     maps: list[MapsResult] = field(default_factory=list)
     organic: list[OrganicResult] = field(default_factory=list)
+
+    def to_competition_dict(self) -> dict:
+        """
+        Convert to dict format expected by calculate_competition_score().
+
+        Returns dict with keys: ads, organic_results, local_results
+        """
+        return {
+            "ads": [
+                {
+                    "position": ad.position,
+                    "title": ad.headline,
+                    "displayed_link": ad.display_url,
+                    "link": ad.destination_url,
+                    "description": ad.description,
+                    "block_position": "top" if ad.is_top else "bottom",
+                }
+                for ad in self.ads
+            ],
+            "organic_results": [
+                {
+                    "position": org.position,
+                    "title": org.title,
+                    "link": org.url,
+                    "displayed_link": org.domain,
+                    "snippet": org.snippet,
+                }
+                for org in self.organic
+            ],
+            "local_results": {
+                "places": [
+                    {
+                        "position": m.position,
+                        "title": m.name,
+                        "rating": m.rating,
+                        "reviews": m.review_count,
+                        "type": m.category,
+                        "address": m.address,
+                        "phone": m.phone,
+                        "website": m.website,
+                    }
+                    for m in self.maps
+                ]
+            },
+            "local_ads": [],  # Local services not typically in SerpResults
+        }
 
 
 @dataclass
@@ -116,6 +168,22 @@ class Prospect:
     priority_score: float = 0.0
     opportunity_notes: str = ""
 
+    # Competition & Market Context (Andy's methodology)
+    competition_score: int = 50  # 0-100, higher = less competition
+    market_saturation: str = "medium"  # low, medium, high, saturated
+    franchise_competition: bool = False
+    ads_in_market: int = 0
+
+    # Industry Classification
+    industry_category: str = "standard"  # commoditised, standard, niche, specialist
+    industry_multiplier: float = 1.0  # 0.4 - 1.6
+
+    # GBP-specific Signals
+    gbp_has_website: Optional[bool] = None  # None = not from Maps
+    gbp_website_missing_opportunity: bool = False  # Good reviews + no website
+    gbp_opportunity_boost: int = 0  # Extra points for opportunity score
+    gbp_notes: list = field(default_factory=list)
+
     # Metadata
     source: str = ""  # Where this prospect was first found
     scraped_at: datetime = field(default_factory=datetime.now)
@@ -178,6 +246,19 @@ class Prospect:
             "opportunity_score": self.opportunity_score,
             "priority_score": round(self.priority_score, 2),
             "opportunity_notes": self.opportunity_notes,
+            # Competition & Market
+            "competition_score": self.competition_score,
+            "market_saturation": self.market_saturation,
+            "franchise_competition": self.franchise_competition,
+            "ads_in_market": self.ads_in_market,
+            # Industry
+            "industry_category": self.industry_category,
+            "industry_multiplier": self.industry_multiplier,
+            # GBP
+            "gbp_has_website": self.gbp_has_website,
+            "gbp_website_missing_opportunity": self.gbp_website_missing_opportunity,
+            "gbp_opportunity_boost": self.gbp_opportunity_boost,
+            "gbp_notes": self.gbp_notes,
             "source": self.source,
         }
 

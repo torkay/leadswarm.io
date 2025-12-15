@@ -320,6 +320,11 @@ def deduplicate_serp_results(serp_results: SerpResults, location: str = "") -> l
                 found_in_maps=True,
                 maps_position=maps_result.position,
                 source="maps",
+                # GBP detection fields (Andy's methodology)
+                gbp_has_website=maps_result.gbp_has_website,
+                gbp_website_missing_opportunity=maps_result.gbp_website_missing_opportunity,
+                gbp_opportunity_boost=maps_result.gbp_opportunity_boost,
+                gbp_notes=maps_result.gbp_notes or [],
             )
 
     # Process ads (merge with existing or add new)

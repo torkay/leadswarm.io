@@ -78,6 +78,110 @@
         .score-high { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
         .score-med { background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); }
         .score-low { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .score-muted { background: rgba(161, 161, 170, 0.1); color: #71717a; border: 1px solid rgba(161, 161, 170, 0.2); }
+
+        /* Industry Category Badges (Andy's Methodology) */
+        .industry-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap;
+        }
+
+        .industry-commoditised {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .industry-standard {
+            background: rgba(156, 163, 175, 0.15);
+            color: #9ca3af;
+        }
+
+        .industry-niche {
+            background: rgba(168, 85, 247, 0.15);
+            color: #a855f7;
+        }
+
+        .industry-specialist {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+
+        /* GBP Opportunity Flag */
+        .gbp-opportunity {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            animation: pulse-subtle 2s infinite;
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* GBP Opportunity Section in Detail Panel */
+        .gbp-opportunity-section {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.25);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .gbp-pitch-box {
+            background: var(--bg-tertiary);
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+
+        /* Market Saturation Indicator */
+        .saturation-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .saturation-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .saturation-low { background: rgba(34, 197, 94, 0.1); }
+        .saturation-low .saturation-dot { background: #22c55e; }
+
+        .saturation-medium { background: rgba(234, 179, 8, 0.1); }
+        .saturation-medium .saturation-dot { background: #fbbf24; }
+
+        .saturation-high { background: rgba(249, 115, 22, 0.1); }
+        .saturation-high .saturation-dot { background: #f97316; }
+
+        .saturation-saturated { background: rgba(239, 68, 68, 0.1); }
+        .saturation-saturated .saturation-dot { background: #ef4444; }
+
+        /* Score badges row */
+        .score-badges {
+            display: inline-flex;
+            flex-wrap: nowrap;
+            gap: 6px;
+            align-items: center;
+            justify-content: center;
+        }
 
         /* Status badges */
         .status-new { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
@@ -464,11 +568,12 @@
         .data-table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
 
         .data-table th {
             text-align: left;
-            padding: 12px 16px;
+            padding: 10px 12px;
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
@@ -478,16 +583,60 @@
             background: var(--bg-secondary);
             position: sticky;
             top: 0;
+            white-space: nowrap;
         }
 
         .data-table td {
-            padding: 12px 16px;
+            padding: 10px 12px;
             border-bottom: 1px solid var(--border);
-            vertical-align: top;
+            vertical-align: middle;
         }
 
         .data-table tbody tr:hover {
             background: var(--bg-tertiary);
+        }
+
+        /* Table column widths for better layout */
+        .data-table th:nth-child(1),
+        .data-table td:nth-child(1) { width: 36px; padding: 10px 8px; } /* Checkbox */
+
+        .data-table th:nth-child(2),
+        .data-table td:nth-child(2) { width: 22%; min-width: 160px; } /* Business */
+
+        .data-table th:nth-child(3),
+        .data-table td:nth-child(3) { width: 15%; min-width: 130px; } /* Contact */
+
+        .data-table th:nth-child(4),
+        .data-table th:nth-child(5),
+        .data-table td:nth-child(4),
+        .data-table td:nth-child(5) { width: 52px; text-align: center; padding: 10px 6px; } /* Fit, Opp */
+
+        .data-table th:nth-child(6),
+        .data-table td:nth-child(6) { width: 70px; text-align: center; padding: 10px 6px; } /* Comp + dot */
+
+        .data-table th:nth-child(7),
+        .data-table td:nth-child(7) { width: 110px; text-align: center; padding: 10px 6px; } /* Priority + badge */
+
+        .data-table th:nth-child(8),
+        .data-table td:nth-child(8) { width: 95px; padding: 10px 8px; } /* Status */
+
+        .data-table th:nth-child(9),
+        .data-table td:nth-child(9) { min-width: 160px; } /* Notes */
+
+        .data-table th:nth-child(10),
+        .data-table td:nth-child(10) { width: 44px; text-align: center; padding: 10px 6px; } /* Actions */
+
+        /* Ensure table doesn't overflow */
+        .data-table-wrapper {
+            overflow-x: auto;
+        }
+
+        /* Truncated email styling */
+        .email-truncated {
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         /* Input styling */
@@ -1057,15 +1206,46 @@
             color: #fbbf24;
         }
 
-        /* Notes preview */
+        /* Notes preview with multi-line and fade gradient */
         .notes-preview {
-            max-width: 200px;
+            position: relative;
+            cursor: help;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
             overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            cursor: pointer;
+            max-height: 2.8em; /* 2 lines × 1.4 line-height */
+        }
+        /* Subtle fade-out effect using mask-image (works with any bg) */
+        .notes-preview {
+            -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+            mask-image: linear-gradient(to right, black 85%, transparent 100%);
         }
         .notes-preview:hover {
+            color: var(--text-primary);
+            -webkit-mask-image: none;
+            mask-image: none;
+        }
+        /* CSS Tooltip for notes - positioned right to avoid overflow */
+        .notes-preview[data-notes]:not([data-notes=""]):hover::after {
+            content: attr(data-notes);
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 4px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 6px;
+            white-space: normal;
+            max-width: 320px;
+            min-width: 180px;
+            font-size: 12px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            pointer-events: none;
+            line-height: 1.5;
             color: var(--text-primary);
         }
 
@@ -2986,6 +3166,12 @@
                                 <option value="opportunity_score">Opportunity</option>
                                 <option value="first_seen_at">Date Found</option>
                             </select>
+
+                            <label class="flex items-center gap-2 text-sm cursor-pointer" title="Show only prospects with no website on Google Business Profile">
+                                <input type="checkbox" id="gbp-filter" class="accent-amber-400">
+                                <span class="gbp-opportunity" style="animation: none;">GBP</span>
+                                <span class="text-zinc-400 hidden sm:inline">opportunities</span>
+                            </label>
                         </div>
 
                         <div class="flex items-center gap-3">
@@ -3023,6 +3209,7 @@
                                     <th>Contact</th>
                                     <th>Fit</th>
                                     <th>Opp</th>
+                                    <th>Comp</th>
                                     <th>Priority</th>
                                     <th>Status</th>
                                     <th>Notes</th>
@@ -3051,6 +3238,12 @@
 
                 document.getElementById('sort-filter').addEventListener('change', (e) => {
                     currentFilters.sort_by = e.target.value;
+                    loadProspectsPage();
+                });
+
+                // GBP opportunity filter
+                document.getElementById('gbp-filter').addEventListener('change', (e) => {
+                    currentFilters.gbp_only = e.target.checked ? 'true' : '';
                     loadProspectsPage();
                 });
 
@@ -3178,7 +3371,7 @@
 
             return prospects.map(p => {
                 const cleanName = cleanBusinessName(p.name) || 'Unknown';
-                const displayName = smartTruncate(cleanName, 32);
+                const displayName = cleanName;
 
                 return `
                 <tr class="hover-row" data-id="${p.id}" style="cursor: pointer;" onclick="openDetailPanel(${p.id})">
@@ -3197,20 +3390,32 @@
                     <td class="text-sm" onclick="event.stopPropagation();">
                         ${p.phone ? `
                             <div class="mono copyable" style="display: inline-flex; align-items: center; cursor: pointer;" onclick="copyToClipboard('${escapeHtml(p.phone)}', 'Phone')">
-                                ${escapeHtml(p.phone)}
+                                ${escapeHtml(formatPhone(p.phone))}
                                 <i data-lucide="copy" class="copy-icon"></i>
                             </div>
                         ` : ''}
                         ${p.emails ? `
-                            <div class="text-zinc-500 text-xs copyable" style="display: inline-flex; align-items: center; cursor: pointer;" onclick="copyToClipboard('${escapeHtml(p.emails.split(',')[0])}', 'Email')">
-                                ${escapeHtml(p.emails.split(',')[0])}
+                            <div class="text-zinc-500 text-xs copyable email-truncated" style="display: inline-flex; align-items: center; cursor: pointer;" onclick="copyToClipboard('${escapeHtml(p.emails.split(',')[0])}', 'Email')" title="${escapeHtml(p.emails.split(',')[0])}">
+                                ${escapeHtml(truncateEmail(p.emails.split(',')[0]))}
                                 <i data-lucide="copy" class="copy-icon"></i>
                             </div>
                         ` : ''}
                     </td>
                     <td><span class="px-2 py-1 rounded text-xs font-mono ${scoreClass(p.fit_score)}">${p.fit_score}</span></td>
                     <td><span class="px-2 py-1 rounded text-xs font-mono ${scoreClass(p.opportunity_score)}">${p.opportunity_score}</span></td>
-                    <td><span class="px-2 py-1 rounded text-xs font-mono font-bold ${scoreClass(p.priority_score)}">${Math.round(p.priority_score)}</span></td>
+                    <td>
+                        <div class="score-badges">
+                            <span class="px-2 py-1 rounded text-xs font-mono ${compScoreClass(p.competition_score)}" title="${p.market_saturation || 'medium'} competition">${p.competition_score != null ? p.competition_score : '-'}</span>
+                            ${renderSaturationBadge(p)}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="score-badges">
+                            <span class="px-2 py-1 rounded text-xs font-mono font-bold ${scoreClass(p.priority_score)}">${Math.round(p.priority_score)}</span>
+                            ${renderIndustryBadge(p)}
+                            ${renderGbpBadge(p)}
+                        </div>
+                    </td>
                     <td onclick="event.stopPropagation();">
                         <select class="status-select-styled status-${p.status} status-select" data-id="${p.id}">
                             <option value="new" ${p.status === 'new' ? 'selected' : ''}>● New</option>
@@ -3222,7 +3427,7 @@
                             <option value="skipped" ${p.status === 'skipped' ? 'selected' : ''}>→ Skip</option>
                         </select>
                     </td>
-                    <td class="notes-preview text-xs text-zinc-500" title="${escapeHtml(p.opportunity_notes || '')}">${escapeHtml(truncateNotes(p.opportunity_notes, 40))}</td>
+                    <td class="notes-preview text-xs text-zinc-400" data-notes="${escapeHtml(p.opportunity_notes || '')}">${escapeHtml(truncateNotes(p.opportunity_notes, 80))}</td>
                     <td onclick="event.stopPropagation();">
                         <div class="flex items-center gap-2">
                             <button class="p-1 hover:bg-zinc-700 rounded" onclick="openDetailPanel(${p.id})" title="Details">
@@ -3280,7 +3485,11 @@
                             ` : ''}
                         </div>
                         <div class="prospect-card-scores">
-                            <span class="px-2 py-1 rounded text-xs font-mono ${scoreClass(p.priority_score)}">${Math.round(p.priority_score)}</span>
+                            <div class="score-badges">
+                                <span class="px-2 py-1 rounded text-xs font-mono ${scoreClass(p.priority_score)}">${Math.round(p.priority_score)}</span>
+                                ${renderIndustryBadge(p)}
+                                ${renderGbpBadge(p)}
+                            </div>
                         </div>
                     </div>
 
@@ -3327,6 +3536,145 @@
             if (score >= 60) return 'score-high';
             if (score >= 40) return 'score-med';
             return 'score-low';
+        }
+
+        // Competition score is reversed: higher = less competition = better (green)
+        function compScoreClass(score) {
+            if (score == null) return 'score-muted';
+            if (score >= 70) return 'score-high';  // Low competition - good
+            if (score >= 40) return 'score-med';   // Medium competition
+            return 'score-low';                     // High competition - bad
+        }
+
+        // Format phone numbers to consistent Australian format
+        function formatPhone(phone) {
+            if (!phone) return '';
+
+            // Remove all non-digits except leading +
+            let digits = phone.replace(/[^\d+]/g, '');
+
+            // Handle +61 prefix
+            if (digits.startsWith('+61')) {
+                digits = digits.substring(3);  // Remove +61
+            } else if (digits.startsWith('61') && digits.length > 10) {
+                digits = digits.substring(2);  // Remove 61
+            }
+
+            // Fix 1300/1800 numbers that might have leading 0 after +61 removal
+            if (digits.startsWith('01300') || digits.startsWith('01800')) {
+                digits = digits.substring(1);  // Remove the incorrect leading 0
+            }
+
+            // Add leading 0 for regular numbers (mobiles, landlines)
+            if (digits.length === 9 && !digits.startsWith('1300') && !digits.startsWith('1800')) {
+                digits = '0' + digits;  // e.g., 412345678 -> 0412345678
+            }
+
+            // Format 1300/1800 numbers: 1300 123 456
+            if ((digits.startsWith('1300') || digits.startsWith('1800')) && digits.length === 10) {
+                return `${digits.slice(0,4)} ${digits.slice(4,7)} ${digits.slice(7)}`;
+            }
+
+            // Format based on type
+            if (digits.length === 10) {
+                if (digits.startsWith('04')) {
+                    // Mobile: 0412 345 678
+                    return `${digits.slice(0,4)} ${digits.slice(4,7)} ${digits.slice(7)}`;
+                } else {
+                    // Landline: 07 1234 5678
+                    return `${digits.slice(0,2)} ${digits.slice(2,6)} ${digits.slice(6)}`;
+                }
+            }
+
+            // Return original if can't format
+            return phone;
+        }
+
+        // Truncate email for table display while keeping full email for copy
+        function truncateEmail(email, maxLen = 22) {
+            if (!email) return '';
+            if (email.length <= maxLen) return email;
+
+            // Try to show more of the important part (before @)
+            const atIndex = email.indexOf('@');
+            if (atIndex > 0 && atIndex < maxLen - 3) {
+                // Show full local part + truncated domain
+                const local = email.slice(0, atIndex);
+                const domain = email.slice(atIndex);
+                const remaining = maxLen - local.length - 1; // -1 for @
+                if (remaining > 3) {
+                    return local + domain.slice(0, remaining - 2) + '...';
+                }
+            }
+
+            // Fallback: simple truncation
+            return email.slice(0, maxLen - 3) + '...';
+        }
+
+        // Andy's Methodology Badge Helpers
+        function renderIndustryBadge(p) {
+            // Only show for non-standard categories
+            const category = p.industry_category || 'standard';
+            const multiplier = p.industry_multiplier || 1.0;
+
+            if (category === 'standard') return '';
+
+            return `<span class="industry-badge industry-${category}" title="${category} (${multiplier}x value)">${multiplier}x</span>`;
+        }
+
+        function renderGbpBadge(p) {
+            // Show GBP opportunity flag for prospects with no website on Google profile
+            if (p.gbp_website_missing_opportunity) {
+                const rating = p.rating ? `${p.rating}★` : '';
+                const reviews = p.review_count ? `/${p.review_count}` : '';
+                return `<span class="gbp-opportunity" title="No website on Google profile ${rating}${reviews} - Easy sell!">GBP</span>`;
+            }
+            return '';
+        }
+
+        function renderSaturationBadge(p) {
+            const saturation = p.market_saturation || 'medium';
+
+            // Show saturation indicator for all levels
+            const titles = {
+                low: 'Low competition - excellent opportunity',
+                medium: 'Medium competition',
+                high: 'High competition - need differentiation',
+                saturated: 'Saturated market - difficult to compete'
+            };
+            const title = titles[saturation] || titles.medium;
+
+            return `<span class="saturation-badge saturation-${saturation}" title="${title}"><span class="saturation-dot"></span></span>`;
+        }
+
+        // Render saturation level with indicator for detail panel
+        function renderSaturationLevel(saturation) {
+            const level = saturation || 'medium';
+            const colors = {
+                low: { dot: '#22c55e', text: 'Low competition' },
+                medium: { dot: '#eab308', text: 'Medium competition' },
+                high: { dot: '#f97316', text: 'High competition' },
+                saturated: { dot: '#ef4444', text: 'Saturated market' }
+            };
+            const c = colors[level] || colors.medium;
+            return `<span style="display: inline-flex; align-items: center; gap: 6px;">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: ${c.dot};"></span>
+                ${c.text}
+            </span>`;
+        }
+
+        // Render industry info for detail panel
+        function renderIndustryInfo(p) {
+            const category = p.industry_category || 'standard';
+            const multiplier = p.industry_multiplier || 1.0;
+            const labels = {
+                commoditised: { color: '#ef4444', label: 'Commoditised' },
+                standard: { color: '#9ca3af', label: 'Standard' },
+                niche: { color: '#a855f7', label: 'Niche' },
+                specialist: { color: '#22c55e', label: 'Specialist' }
+            };
+            const info = labels[category] || labels.standard;
+            return `<span class="industry-badge industry-${category}">${info.label} (${multiplier}x)</span>`;
         }
 
         async function updateProspectStatus(id, status) {
@@ -3504,6 +3852,61 @@
                             </div>
                         ` : ''}
                     </div>
+
+                    <!-- Market Analysis (Andy's Methodology) -->
+                    <div class="detail-section">
+                        <div class="detail-section-title">
+                            <i data-lucide="bar-chart-2" style="width: 14px; height: 14px; display: inline; vertical-align: middle; margin-right: 4px;"></i>
+                            Market Analysis
+                        </div>
+                        <div class="tech-field">
+                            <span class="tech-field-label">Competition Score</span>
+                            <span class="tech-field-value">
+                                ${prospect.competition_score != null ?
+                                    `<span class="px-2 py-1 rounded text-xs font-mono ${compScoreClass(prospect.competition_score)}">${prospect.competition_score}</span>` :
+                                    '<span class="text-zinc-500">Not analysed</span>'
+                                }
+                            </span>
+                        </div>
+                        <div class="tech-field">
+                            <span class="tech-field-label">Market Saturation</span>
+                            <span class="tech-field-value">
+                                ${renderSaturationLevel(prospect.market_saturation)}
+                            </span>
+                        </div>
+                        ${prospect.franchise_competition ? `
+                            <div class="tech-field">
+                                <span class="tech-field-label">⚠️ Alert</span>
+                                <span class="tech-field-value text-yellow">Major franchise competition detected</span>
+                            </div>
+                        ` : ''}
+                        <div class="tech-field">
+                            <span class="tech-field-label">Industry Category</span>
+                            <span class="tech-field-value">
+                                ${renderIndustryInfo(prospect)}
+                            </span>
+                        </div>
+                    </div>
+
+                    ${prospect.gbp_website_missing_opportunity ? `
+                    <!-- GBP Opportunity Flag (Easy Win) -->
+                    <div class="detail-section gbp-opportunity-section">
+                        <div class="detail-section-title" style="color: #fbbf24;">
+                            🎯 Easy Win Opportunity
+                        </div>
+                        <p style="font-size: 13px; line-height: 1.5; margin-bottom: 12px;">
+                            This business has <strong>${prospect.rating || 'good'}★</strong> rating
+                            ${prospect.review_count ? `with <strong>${formatNumber(prospect.review_count)} reviews</strong>` : ''}
+                            but <strong>no website linked</strong> to their Google Business Profile.
+                        </p>
+                        <div class="gbp-pitch-box">
+                            <strong style="font-size: 11px; color: var(--text-secondary);">Suggested pitch:</strong>
+                            <p style="font-style: italic; color: var(--text-secondary); font-size: 12px; margin-top: 4px;">
+                                "I noticed your Google profile is missing a website link. This means potential customers can't easily learn more about your services. I can help fix this and improve your online presence."
+                            </p>
+                        </div>
+                    </div>
+                    ` : ''}
 
                     <!-- Quick Actions -->
                     <div class="detail-section">

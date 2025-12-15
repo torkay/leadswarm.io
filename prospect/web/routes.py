@@ -196,7 +196,14 @@ async def run_search_job(job_id: str):
         from prospect.scraper.serpapi import SerpAPIClient, AuthenticationError
         from prospect.dedup import deduplicate_serp_results
         from prospect.enrichment.crawler import WebsiteCrawler
-        from prospect.scoring import calculate_fit_score, calculate_opportunity_score, generate_opportunity_notes
+        from prospect.scoring import (
+            calculate_fit_score,
+            calculate_opportunity_score,
+            generate_opportunity_notes,
+            score_prospect,
+            apply_scores_to_prospect,
+            classify_industry,
+        )
         from prospect.config import ScraperConfig
 
         # Phase 1: Search
@@ -211,6 +218,9 @@ async def run_search_job(job_id: str):
             client = SerpAPIClient()
             serp_results = client.search(job.business_type, job.location, job.limit)
             client.close()
+
+            # Store competition dict for scoring phase
+            competition_dict = serp_results.to_competition_dict()
         except AuthenticationError as e:
             await job_manager.update_job(
                 job_id,
@@ -228,6 +238,14 @@ async def run_search_job(job_id: str):
 
         # Deduplicate (pass location for phone validation)
         prospects = deduplicate_serp_results(serp_results, location=job.location)
+
+        # Apply relevance filter to remove false positives
+        from prospect.scraper.relevance import filter_prospect_objects
+        prospects = filter_prospect_objects(
+            prospects,
+            search_query=job.business_type,
+            strict=False,
+        )
 
         await job_manager.update_job(
             job_id,
@@ -275,18 +293,32 @@ async def run_search_job(job_id: str):
                 # Small delay between requests
                 await asyncio.sleep(0.1)
 
-        # Phase 3: Score
+        # Phase 3: Score (Andy's Methodology)
         await job_manager.update_job(
             job_id,
             status=JobStatus.SCORING,
             progress_message="Scoring prospects..."
         )
 
+        # Classify industry for all prospects
+        industry_class = classify_industry(job.business_type)
+
         for prospect in prospects:
-            prospect.fit_score = calculate_fit_score(prospect)
-            prospect.opportunity_score = calculate_opportunity_score(prospect)
-            prospect.priority_score = (prospect.fit_score + prospect.opportunity_score) / 2
-            prospect.opportunity_notes = generate_opportunity_notes(prospect)
+            # Use unified scoring engine with new weighted formula
+            # Priority = (Fit x 0.3 + Opportunity x 0.5 + Competition x 0.2) x Industry Multiplier
+            score = score_prospect(
+                prospect,
+                search_results=competition_dict,  # Pass competition data from search phase
+                search_query=job.business_type,
+                search_location=job.location,
+            )
+
+            # Apply all scores to prospect
+            apply_scores_to_prospect(prospect, score)
+
+            # Also set industry fields from classification
+            prospect.industry_category = industry_class.category
+            prospect.industry_multiplier = industry_class.multiplier
 
         # Sort by priority score
         prospects.sort(key=lambda p: p.priority_score, reverse=True)

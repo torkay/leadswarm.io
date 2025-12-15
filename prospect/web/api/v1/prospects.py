@@ -41,6 +41,15 @@ class ProspectResponse(BaseModel):
     opportunity_score: int
     priority_score: float
     opportunity_notes: Optional[str]
+    # Andy's methodology fields
+    competition_score: int = 50
+    market_saturation: str = "medium"
+    franchise_competition: bool = False
+    industry_category: str = "standard"
+    industry_multiplier: float = 1.0
+    gbp_has_website: Optional[bool] = None
+    gbp_website_missing_opportunity: bool = False
+    # Workflow
     status: str
     user_notes: Optional[str]
     tags: List[str]
@@ -71,6 +80,7 @@ def list_prospects(
     min_opportunity: Optional[int] = None,
     has_email: Optional[bool] = None,
     has_phone: Optional[bool] = None,
+    gbp_only: Optional[bool] = None,
     tag: Optional[str] = None,
     q: Optional[str] = None,
     sort_by: str = Query(default="priority_score", pattern="^(priority_score|fit_score|opportunity_score|first_seen_at|name)$"),
@@ -100,6 +110,8 @@ def list_prospects(
         query = query.filter(Prospect.emails.isnot(None), Prospect.emails != "")
     if has_phone:
         query = query.filter(Prospect.phone.isnot(None), Prospect.phone != "")
+    if gbp_only:
+        query = query.filter(Prospect.gbp_website_missing_opportunity == True)
     if q:
         query = query.filter(
             or_(
@@ -138,6 +150,15 @@ def list_prospects(
             opportunity_score=p.opportunity_score,
             priority_score=p.priority_score,
             opportunity_notes=p.opportunity_notes,
+            # Andy's methodology fields
+            competition_score=p.competition_score or 50,
+            market_saturation=p.market_saturation or "medium",
+            franchise_competition=p.franchise_competition or False,
+            industry_category=p.industry_category or "standard",
+            industry_multiplier=p.industry_multiplier or 1.0,
+            gbp_has_website=p.gbp_has_website,
+            gbp_website_missing_opportunity=p.gbp_website_missing_opportunity or False,
+            # Workflow
             status=p.status,
             user_notes=p.user_notes,
             tags=p.tags or [],
@@ -202,6 +223,10 @@ def get_prospect_stats(
     phone_query = base_query.filter(Prospect.phone.isnot(None), Prospect.phone != "")
     with_phone = phone_query.count()
 
+    # Calculate actual contact rate (prospects that have been contacted/meeting/won/lost)
+    contacted_statuses = ['contacted', 'meeting', 'won', 'lost']
+    contacted_count = sum(status_breakdown.get(s, 0) for s in contacted_statuses)
+
     return ProspectStats(
         total=total,
         status_breakdown=status_breakdown,
@@ -210,7 +235,7 @@ def get_prospect_stats(
         avg_priority_score=round(float(avg_pri), 1),
         with_email=with_email,
         with_phone=with_phone,
-        contact_rate=round(with_email / total * 100, 1) if total > 0 else 0,
+        contact_rate=round(contacted_count / total * 100, 1) if total > 0 else 0,
     )
 
 
@@ -242,6 +267,15 @@ def get_prospect(
         opportunity_score=prospect.opportunity_score,
         priority_score=prospect.priority_score,
         opportunity_notes=prospect.opportunity_notes,
+        # Andy's methodology fields
+        competition_score=prospect.competition_score or 50,
+        market_saturation=prospect.market_saturation or "medium",
+        franchise_competition=prospect.franchise_competition or False,
+        industry_category=prospect.industry_category or "standard",
+        industry_multiplier=prospect.industry_multiplier or 1.0,
+        gbp_has_website=prospect.gbp_has_website,
+        gbp_website_missing_opportunity=prospect.gbp_website_missing_opportunity or False,
+        # Workflow
         status=prospect.status,
         user_notes=prospect.user_notes,
         tags=prospect.tags or [],
@@ -305,6 +339,15 @@ def update_prospect(
         opportunity_score=prospect.opportunity_score,
         priority_score=prospect.priority_score,
         opportunity_notes=prospect.opportunity_notes,
+        # Andy's methodology fields
+        competition_score=prospect.competition_score or 50,
+        market_saturation=prospect.market_saturation or "medium",
+        franchise_competition=prospect.franchise_competition or False,
+        industry_category=prospect.industry_category or "standard",
+        industry_multiplier=prospect.industry_multiplier or 1.0,
+        gbp_has_website=prospect.gbp_has_website,
+        gbp_website_missing_opportunity=prospect.gbp_website_missing_opportunity or False,
+        # Workflow
         status=prospect.status,
         user_notes=prospect.user_notes,
         tags=prospect.tags or [],
@@ -346,6 +389,15 @@ def skip_prospect(
         opportunity_score=prospect.opportunity_score,
         priority_score=prospect.priority_score,
         opportunity_notes=prospect.opportunity_notes,
+        # Andy's methodology fields
+        competition_score=prospect.competition_score or 50,
+        market_saturation=prospect.market_saturation or "medium",
+        franchise_competition=prospect.franchise_competition or False,
+        industry_category=prospect.industry_category or "standard",
+        industry_multiplier=prospect.industry_multiplier or 1.0,
+        gbp_has_website=prospect.gbp_has_website,
+        gbp_website_missing_opportunity=prospect.gbp_website_missing_opportunity or False,
+        # Workflow
         status=prospect.status,
         user_notes=prospect.user_notes,
         tags=prospect.tags or [],

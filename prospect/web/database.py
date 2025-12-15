@@ -4,7 +4,7 @@ import os
 import logging
 from datetime import datetime
 from typing import Optional, List, Generator
-from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, DateTime, Text, ForeignKey, JSON
+from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, DateTime, Text, ForeignKey, JSON, UniqueConstraint
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
 
 logger = logging.getLogger(__name__)
@@ -198,6 +198,20 @@ class Prospect(Base):
     priority_score = Column(Float, default=0)
     opportunity_notes = Column(Text)
 
+    # Competition & Market Context (Andy's Methodology)
+    competition_score = Column(Integer, default=50)  # 0-100, higher = less competition
+    market_saturation = Column(String(20), default="medium")  # low, medium, high, saturated
+    franchise_competition = Column(Boolean, default=False)
+    ads_in_market = Column(Integer, default=0)
+
+    # Industry Classification
+    industry_category = Column(String(20), default="standard")  # commoditised, standard, niche, specialist
+    industry_multiplier = Column(Float, default=1.0)  # 0.4 - 1.6
+
+    # GBP-specific Signals
+    gbp_has_website = Column(Boolean, default=None)  # None = not from Maps, True/False = detected
+    gbp_website_missing_opportunity = Column(Boolean, default=False)  # Good reviews + no website
+
     # User workflow
     status = Column(String(20), default="new")  # new, qualified, contacted, meeting, won, lost, skipped
     user_notes = Column(Text)
@@ -242,6 +256,17 @@ class Prospect(Base):
             "opportunity_score": self.opportunity_score,
             "priority_score": self.priority_score,
             "opportunity_notes": self.opportunity_notes,
+            # Competition & Market
+            "competition_score": self.competition_score,
+            "market_saturation": self.market_saturation,
+            "franchise_competition": self.franchise_competition,
+            "ads_in_market": self.ads_in_market,
+            # Industry
+            "industry_category": self.industry_category,
+            "industry_multiplier": self.industry_multiplier,
+            # GBP
+            "gbp_has_website": self.gbp_has_website,
+            "gbp_website_missing_opportunity": self.gbp_website_missing_opportunity,
             "status": self.status,
             "user_notes": self.user_notes,
             "contacted_at": self.contacted_at.isoformat() if self.contacted_at else None,
@@ -276,6 +301,45 @@ class ExportHistory(Base):
 
     # For Sheets exports
     sheet_url = Column(String(500), nullable=True)
+
+
+class SearchMetrics(Base):
+    """
+    Cache competition metrics per query/location.
+
+    Stores market analysis that can be reused across prospects
+    from the same search to avoid recalculating.
+    """
+    __tablename__ = "search_metrics"
+
+    id = Column(Integer, primary_key=True, index=True)
+    query = Column(String(255), nullable=False)
+    location = Column(String(255), nullable=False)
+
+    # Competition data from search results
+    organic_count = Column(Integer, default=0)
+    maps_count = Column(Integer, default=0)
+    ads_count = Column(Integer, default=0)
+
+    # Calculated competition score
+    competition_score = Column(Integer, default=50)  # 0-100, higher = less competition
+    market_saturation = Column(String(20))  # low, medium, high, saturated
+
+    # Franchise detection
+    franchises_detected = Column(Text, default="[]")  # JSON array of franchise names
+    has_major_franchise = Column(Boolean, default=False)
+
+    # Industry classification for this query
+    industry_category = Column(String(20))  # commoditised, standard, niche, specialist
+    industry_multiplier = Column(Float, default=1.0)
+
+    # Timestamp
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Unique constraint on query + location
+    __table_args__ = (
+        UniqueConstraint('query', 'location', name='uq_search_metrics_query_location'),
+    )
 
 
 def seed_search_configs(db: Session) -> None:
@@ -391,6 +455,7 @@ def save_prospects_from_results(db: Session, search_id: int, results: list) -> L
     Save prospect results to database.
 
     Converts search results (Prospect model from models.py) to database Prospect records.
+    Includes Andy's methodology fields (competition, industry, GBP).
     """
     prospects = []
     for r in results:
@@ -421,6 +486,15 @@ def save_prospects_from_results(db: Session, search_id: int, results: list) -> L
             opportunity_score=r.opportunity_score,
             priority_score=r.priority_score,
             opportunity_notes=r.opportunity_notes,
+            # Andy's methodology fields
+            competition_score=getattr(r, 'competition_score', 50),
+            market_saturation=getattr(r, 'market_saturation', 'medium'),
+            franchise_competition=getattr(r, 'franchise_competition', False),
+            ads_in_market=getattr(r, 'ads_in_market', 0),
+            industry_category=getattr(r, 'industry_category', 'standard'),
+            industry_multiplier=getattr(r, 'industry_multiplier', 1.0),
+            gbp_has_website=getattr(r, 'gbp_has_website', None),
+            gbp_website_missing_opportunity=getattr(r, 'gbp_website_missing_opportunity', False),
         )
         db.add(prospect)
         prospects.append(prospect)

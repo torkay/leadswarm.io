@@ -27,6 +27,10 @@ async def run_search_task(job_id: str, request: SearchRequest):
             calculate_fit_score,
             calculate_opportunity_score,
             generate_opportunity_notes,
+            score_prospect,
+            apply_scores_to_prospect,
+            classify_industry,
+            calculate_competition_score,
         )
         from prospect.config import ScraperConfig
 
@@ -34,6 +38,9 @@ async def run_search_task(job_id: str, request: SearchRequest):
         filters = request.filters
         scoring = request.scoring
         search_config = job.config.get("search_config") if job.config else None
+
+        # Competition data for scoring phase (populated during search)
+        competition_dict = None
 
         # Phase 1: Search
         await job_manager.update_job(
@@ -103,6 +110,9 @@ async def run_search_task(job_id: str, request: SearchRequest):
                     request.limit
                 )
                 client.close()
+
+                # Store competition dict for scoring phase
+                competition_dict = serp_results.to_competition_dict()
             except AuthenticationError as e:
                 await job_manager.update_job(
                     job_id,
@@ -128,6 +138,14 @@ async def run_search_task(job_id: str, request: SearchRequest):
                 p for p in prospects
                 if not p.domain or p.domain.lower() not in exclude_set
             ]
+
+        # Apply relevance filter to remove false positives
+        from prospect.scraper.relevance import filter_prospect_objects
+        prospects = filter_prospect_objects(
+            prospects,
+            search_query=request.business_type,
+            strict=False,  # Non-strict mode: only filter obvious irrelevant results
+        )
 
         await job_manager.update_job(
             job_id,
@@ -176,24 +194,32 @@ async def run_search_task(job_id: str, request: SearchRequest):
                     # Small delay between requests
                     await asyncio.sleep(0.05)
 
-        # Phase 3: Score
+        # Phase 3: Score (Andy's Methodology)
         await job_manager.update_job(
             job_id,
             status=JobStatus.SCORING,
             progress_message="Scoring prospects..."
         )
 
-        fit_weight = scoring.fit_weight
-        opp_weight = scoring.opportunity_weight
+        # Classify industry for all prospects
+        industry_class = classify_industry(request.business_type)
 
         for prospect in prospects:
-            prospect.fit_score = calculate_fit_score(prospect)
-            prospect.opportunity_score = calculate_opportunity_score(prospect)
-            prospect.priority_score = (
-                prospect.fit_score * fit_weight +
-                prospect.opportunity_score * opp_weight
+            # Use unified scoring engine with new weighted formula
+            # Priority = (Fit x 0.3 + Opportunity x 0.5 + Competition x 0.2) x Industry Multiplier
+            score = score_prospect(
+                prospect,
+                search_results=competition_dict,  # Pass competition data from search phase
+                search_query=request.business_type,
+                search_location=request.location,
             )
-            prospect.opportunity_notes = generate_opportunity_notes(prospect)
+
+            # Apply all scores to prospect
+            apply_scores_to_prospect(prospect, score)
+
+            # Also set industry fields from classification
+            prospect.industry_category = industry_class.category
+            prospect.industry_multiplier = industry_class.multiplier
 
         # Sort by priority score
         prospects.sort(key=lambda p: p.priority_score, reverse=True)
