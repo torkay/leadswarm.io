@@ -14,7 +14,17 @@ from sqlalchemy.orm import Session
 from prospect.web.database import get_db, User
 
 # Configuration
-SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "dev-secret-key-change-in-production")
+SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
+if not SECRET_KEY:
+    import sys
+    # Allow missing secret only in development (check for common prod indicators)
+    if os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("PRODUCTION"):
+        print("FATAL: JWT_SECRET_KEY environment variable is required in production", file=sys.stderr)
+        sys.exit(1)
+    # Development fallback with warning
+    SECRET_KEY = "dev-secret-key-DO-NOT-USE-IN-PRODUCTION"
+    import warnings
+    warnings.warn("JWT_SECRET_KEY not set - using insecure development key")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_DAYS = 7
 

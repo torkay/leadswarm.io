@@ -32,6 +32,28 @@ TIER_PRICES = {
 PRICE_TO_TIER = {v: k for k, v in TIER_PRICES.items()}
 
 
+# Validate required Stripe configuration at import time
+def _validate_stripe_config():
+    """Validate Stripe configuration at startup."""
+    import sys
+
+    if not stripe.api_key:
+        if os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("PRODUCTION"):
+            print("FATAL: STRIPE_SECRET_KEY environment variable is required in production", file=sys.stderr)
+            sys.exit(1)
+
+    # Check for placeholder price IDs in production
+    if os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("PRODUCTION"):
+        for tier, price_id in TIER_PRICES.items():
+            if price_id.startswith("price_") and not price_id.startswith("price_1"):
+                # Stripe price IDs start with "price_1", placeholders don't
+                print(f"FATAL: STRIPE_PRICE_{tier.upper()} appears to be a placeholder: {price_id}", file=sys.stderr)
+                sys.exit(1)
+
+
+_validate_stripe_config()
+
+
 class CreateCheckoutSessionRequest(BaseModel):
     """Request to create a Stripe checkout session."""
     tier: str
