@@ -16,7 +16,7 @@ None
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Production Hardening** - Fix security issues blocking beta launch
+- [x] **Phase 1: Production Hardening** - Fix security issues blocking beta launch ✓
 - [ ] **Phase 2: Onboarding Experience** - Welcome modal, guided first search, score explanations
 - [ ] **Phase 3: Score Visibility** - Expand opportunity notes, visual score breakdowns
 - [ ] **Phase 4: Pipeline/CRM** - Prospect status, follow-ups, campaign assignment
@@ -25,16 +25,18 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 ## Phase Details
 
-### Phase 1: Production Hardening
+### Phase 1: Production Hardening ✓
 **Goal**: Fix critical security issues identified in codebase mapping - JWT secret fallback, Stripe env validation, missing imports
 **Depends on**: Nothing (first phase)
 **Research**: Unlikely (internal fixes, established patterns)
-**Plans**: TBD
+**Plans**: 1 (complete)
 
-Known issues to address:
-- Weak JWT secret fallback in `prospect/web/auth.py`
-- Hardcoded Stripe price ID defaults in `prospect/web/api/v1/billing.py`
-- Missing onboarding module import in `prospect/web/api/v1/router.py`
+Completed:
+- ✓ JWT_SECRET_KEY validation at startup (fails in production if missing)
+- ✓ STRIPE_SECRET_KEY validation at startup (fails in production if missing)
+- ✓ STRIPE_PRICE_* placeholder detection (fails in production with placeholder values)
+- ✓ onboarding.py stub module created
+- ✓ .env.example updated with all security-critical variables
 
 ### Phase 2: Onboarding Experience
 **Goal**: Guide new users to first successful search and help them understand what makes a high-scoring prospect valuable
@@ -102,7 +104,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Production Hardening | 0/TBD | Not started | - |
+| 1. Production Hardening | 1/1 | Complete | 2026-01-31 |
 | 2. Onboarding Experience | 0/TBD | Not started | - |
 | 3. Score Visibility | 0/TBD | Not started | - |
 | 4. Pipeline/CRM | 0/TBD | Not started | - |
