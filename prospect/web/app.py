@@ -93,12 +93,6 @@ def create_app(skip_db_init: bool = False) -> FastAPI:
             return HTMLResponse(content=register_path.read_text())
         return HTMLResponse(content="Register page not found", status_code=404)
 
-
-        else:
-            # Redirect to legacy UI if new frontend not found
-            from fastapi.responses import RedirectResponse
-            return RedirectResponse(url="/legacy/")
-
     # PWA manifest
     @app.get("/manifest.json")
     async def serve_manifest():
