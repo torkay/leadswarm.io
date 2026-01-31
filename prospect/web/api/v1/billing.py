@@ -23,9 +23,9 @@ STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET")
 
 # Price IDs for each tier (configure these in Stripe Dashboard)
 TIER_PRICES = {
-    "scout": "price_scout_monthly",      # $99/month
-    "hunter": "price_hunter_monthly",    # $149/month (beta) or $249/month
-    "command": "price_command_monthly",  # $499/month
+    "scout": os.environ.get("STRIPE_PRICE_SCOUT", "price_scout_monthly"),      # $99/month
+    "hunter": os.environ.get("STRIPE_PRICE_HUNTER", "price_hunter_monthly"),    # $149/month (beta) or $249/month
+    "command": os.environ.get("STRIPE_PRICE_COMMAND", "price_command_monthly"),  # $499/month
 }
 
 # Reverse mapping from price ID to tier
