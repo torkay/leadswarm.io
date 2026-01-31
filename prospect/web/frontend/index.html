@@ -4551,7 +4551,7 @@
             if (!prospects.length) {
                 const hasFilters = Object.keys(currentFilters).length > 0;
                 const emptyType = hasFilters ? 'filtered' : 'prospects';
-                return \`<tr><td colspan="9">\${renderEmptyState(emptyType)}</td></tr>\`;
+                return `<tr><td colspan="9">${renderEmptyState(emptyType)}</td></tr>`;
             }
 
             return prospects.map(p => {
@@ -4644,7 +4644,7 @@
                     icon: 'search-x',
                     title: 'No Results Found',
                     message: searchQuery
-                        ? \`We couldn't find any businesses matching "\${searchQuery}". Try adjusting your search terms or location.\`
+                        ? `We couldn't find any businesses matching "${searchQuery}". Try adjusting your search terms or location.`
                         : 'No businesses matched your search criteria. Try different keywords or expand your location.',
                     action: { label: 'Try a New Search', onClick: "navigateTo('search')" }
                 },
@@ -4664,19 +4664,19 @@
 
             const state = states[type] || states.prospects;
 
-            return \`
+            return `
                 <div class="empty-state">
-                    <i data-lucide="\${state.icon}" class="empty-state-icon"></i>
-                    <div class="empty-state-title">\${state.title}</div>
-                    <p>\${state.message}</p>
-                    \${state.action ? \`
-                        <button class="btn-primary" onclick="\${state.action.onClick}">
-                            <i data-lucide="\${state.icon === 'search-x' ? 'search' : 'plus'}" class="w-4 h-4"></i>
-                            \${state.action.label}
+                    <i data-lucide="${state.icon}" class="empty-state-icon"></i>
+                    <div class="empty-state-title">${state.title}</div>
+                    <p>${state.message}</p>
+                    ${state.action ? `
+                        <button class="btn-primary" onclick="${state.action.onClick}">
+                            <i data-lucide="${state.icon === 'search-x' ? 'search' : 'plus'}" class="w-4 h-4"></i>
+                            ${state.action.label}
                         </button>
-                    \` : ''}
+                    ` : ''}
                 </div>
-            \`;
+            `;
         }
 
         function clearFilters() {
@@ -4688,32 +4688,32 @@
         // Error State Helper
         // ============================================
         function renderErrorState(title, message, actions = []) {
-            return \`
+            return `
                 <div class="error-state">
                     <i data-lucide="alert-circle" class="error-state-icon"></i>
-                    <div class="error-state-title">\${title}</div>
-                    <div class="error-state-message">\${message}</div>
+                    <div class="error-state-title">${title}</div>
+                    <div class="error-state-message">${message}</div>
                     <div class="error-state-actions">
-                        \${actions.map(action => \`
-                            <button class="\${action.primary ? 'btn-primary' : 'btn-secondary'}" onclick="\${action.onClick}">
-                                \${action.label}
+                        ${actions.map(action => `
+                            <button class="${action.primary ? 'btn-primary' : 'btn-secondary'}" onclick="${action.onClick}">
+                                ${action.label}
                             </button>
-                        \`).join('')}
+                        `).join('')}
                     </div>
                 </div>
-            \`;
+            `;
         }
 
         // ============================================
         // Loading State Helper
         // ============================================
         function renderLoadingState(message = 'Loading...') {
-            return \`
+            return `
                 <div class="page-loading">
                     <div class="loading-spinner loading-spinner-lg"></div>
-                    <div class="page-loading-text">\${message}</div>
+                    <div class="page-loading-text">${message}</div>
                 </div>
-            \`;
+            `;
         }
 
         function renderProspectCard(p) {
