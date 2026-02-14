@@ -1,13 +1,13 @@
 /**
- * Service Worker for Prospect Command Center PWA
+ * Service Worker for LeadSwarm app (/app scope)
  * Provides basic offline support and caching
  */
 
-const CACHE_NAME = 'prospect-v1';
+const CACHE_NAME = 'leadswarm-app-v1';
 const STATIC_ASSETS = [
-    '/',
-    '/index.html',
-    '/manifest.json',
+    '/app/',
+    '/app/index.html',
+    '/app/manifest.json',
 ];
 
 // Install event - cache static assets

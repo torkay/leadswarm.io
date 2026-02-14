@@ -7,7 +7,7 @@ from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from prospect.web.database import init_db
@@ -19,6 +19,7 @@ WEB_DIR = Path(__file__).parent
 TEMPLATES_DIR = WEB_DIR / "templates"
 STATIC_DIR = WEB_DIR / "static"
 FRONTEND_DIR = WEB_DIR / "frontend"
+MARKETING_DIR = WEB_DIR / "marketing"
 
 
 def create_app(skip_db_init: bool = False) -> FastAPI:
@@ -33,8 +34,8 @@ def create_app(skip_db_init: bool = False) -> FastAPI:
             logger.warning("Continuing without database initialization")
 
     app = FastAPI(
-        title="Prospect Command Center",
-        description="Marketing prospect discovery and management tool",
+        title="LeadSwarm",
+        description="Prospecting discovery and scoring tool",
         version="1.0.0",
         docs_url="/docs",
         redoc_url="/redoc",
@@ -63,6 +64,10 @@ def create_app(skip_db_init: bool = False) -> FastAPI:
     if STATIC_DIR.exists():
         app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
+    # Marketing site static files
+    if MARKETING_DIR.exists():
+        app.mount("/site", StaticFiles(directory=str(MARKETING_DIR), html=False), name="marketing")
+
     # API v1 routes
     from prospect.web.api.v1 import router as api_router
     app.include_router(api_router)
@@ -71,13 +76,19 @@ def create_app(skip_db_init: bool = False) -> FastAPI:
     from prospect.web.ws import router as ws_router
     app.include_router(ws_router)
 
-    # Serve frontend SPA at root - MUST be before legacy routes
+    # Serve marketing homepage at root - MUST be before legacy routes
     @app.get("/", response_class=HTMLResponse)
     async def serve_frontend(request: Request):
-        """Serve the frontend SPA."""
+        """Serve the marketing homepage."""
+        marketing_path = MARKETING_DIR / "index.html"
+        if marketing_path.exists():
+            return HTMLResponse(content=marketing_path.read_text())
+
+        # Fallback to app frontend if marketing isn't present.
         frontend_path = FRONTEND_DIR / "index.html"
         if frontend_path.exists():
             return HTMLResponse(content=frontend_path.read_text())
+        return HTMLResponse(content="Not found", status_code=404)
 
     @app.get("/login", response_class=HTMLResponse)
     async def login_page():
@@ -93,25 +104,21 @@ def create_app(skip_db_init: bool = False) -> FastAPI:
             return HTMLResponse(content=register_path.read_text())
         return HTMLResponse(content="Register page not found", status_code=404)
 
-    # PWA manifest
-    @app.get("/manifest.json")
-    async def serve_manifest():
-        """Serve the PWA manifest."""
+    @app.get("/robots.txt")
+    async def robots_txt():
         from fastapi.responses import FileResponse
-        manifest_path = FRONTEND_DIR / "manifest.json"
-        if manifest_path.exists():
-            return FileResponse(manifest_path, media_type="application/json")
-        return {"error": "Not found"}
+        path = MARKETING_DIR / "robots.txt"
+        if path.exists():
+            return FileResponse(path, media_type="text/plain")
+        return PlainTextResponse(content="User-agent: *\nAllow: /\n")
 
-    # Service worker (must be served from root for scope)
-    @app.get("/sw.js")
-    async def serve_service_worker():
-        """Serve the service worker."""
+    @app.get("/sitemap.xml")
+    async def sitemap_xml():
         from fastapi.responses import FileResponse
-        sw_path = FRONTEND_DIR / "sw.js"
-        if sw_path.exists():
-            return FileResponse(sw_path, media_type="application/javascript")
-        return {"error": "Not found"}
+        path = MARKETING_DIR / "sitemap.xml"
+        if path.exists():
+            return FileResponse(path, media_type="application/xml")
+        return Response(content="", media_type="application/xml")
 
     # Legacy HTML routes (moved to /legacy prefix to not conflict with new frontend)
     from prospect.web.routes import router as html_router
@@ -125,7 +132,7 @@ def create_app(skip_db_init: bool = False) -> FastAPI:
     @app.on_event("startup")
     async def startup_event():
         """Initialize resources on startup."""
-        logger.info("Prospect Command Center starting up...")
+        logger.info("LeadSwarm starting up...")
         logger.info(f"Frontend directory: {FRONTEND_DIR}")
         logger.info(f"Templates directory: {TEMPLATES_DIR}")
 

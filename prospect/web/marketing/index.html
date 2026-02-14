@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0e12" />
+
+  <title>LeadSwarm | Turn search into a daily lead feed</title>
+  <meta name="description" content="LeadSwarm finds and scores businesses that need your service. Run a search, get enriched context, and prioritize outreach in minutes." />
+  <meta name="robots" content="index, follow" />
+
+  <meta property="og:title" content="LeadSwarm" />
+  <meta property="og:description" content="Turn search into a daily lead feed. Find and score businesses that need your service." />
+  <meta property="og:type" content="website" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "LeadSwarm",
+    "url": "https://leadswarm.io/",
+    "description": "LeadSwarm turns search into a daily lead feed by discovering, enriching, and scoring prospects.",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "potentialAction": {
+      "@type": "StartAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://leadswarm.io/register"
+      },
+      "name": "Start trial"
+    }
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/site/style.css" />
+</head>
+<body>
+  <div class="bg">
+    <div class="grain" aria-hidden="true"></div>
+    <div class="mesh" aria-hidden="true"></div>
+  </div>
+
+  <header class="top">
+    <a class="brand" href="/" aria-label="LeadSwarm home">
+      <span class="mark" aria-hidden="true"></span>
+      <span class="word">LeadSwarm</span>
+    </a>
+
+    <nav class="nav" aria-label="Primary">
+      <a href="#how" class="navlink">How it works</a>
+      <a href="#proof" class="navlink">What you get</a>
+      <a href="#faq" class="navlink">FAQ</a>
+      <a class="btn ghost" href="/login" data-track="nav_login">Sign in</a>
+      <a class="btn solid" href="/register" data-track="nav_start_trial">Start trial</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="heroCopy">
+        <p class="kicker"><span class="dot" aria-hidden="true"></span> Prospecting, but with receipts</p>
+        <h1>
+          Turn search into a
+          <span class="underline">daily lead feed</span>.
+        </h1>
+        <p class="sub">
+          LeadSwarm finds businesses, enriches what matters (contact + website signals), and scores who to contact first.
+          You spend your time on outreach, not tabs.
+        </p>
+
+        <div class="ctaRow">
+          <a class="btn solid big" href="/register" data-track="hero_start_trial">Start trial</a>
+          <button class="btn ghost big" type="button" data-track="hero_view_sample" id="viewSampleBtn">View a sample</button>
+        </div>
+
+        <div class="fine">
+          <span class="pill">Search</span>
+          <span class="pill">Enrich</span>
+          <span class="pill">Score</span>
+          <span class="pill">Export</span>
+        </div>
+      </div>
+
+      <div class="heroPanel" aria-label="Sample output">
+        <div class="panelHead">
+          <div class="panelTitle">Sample: "Plumbers" in "Brisbane"</div>
+          <div class="panelMeta"><span class="chip">Priority</span> <span class="chip">Opportunity</span> <span class="chip">Fit</span></div>
+        </div>
+
+        <div class="panelBody" id="samplePanel" hidden>
+          <div class="row">
+            <div class="who">
+              <div class="name">Riverbend Plumbing</div>
+              <div class="meta">riverbendplumbing.example · (07) 5555 0123</div>
+            </div>
+            <div class="scores">
+              <span class="score a">92</span>
+              <span class="score b">88</span>
+              <span class="score c">76</span>
+            </div>
+          </div>
+          <div class="notes">
+            Missing analytics; booking flow is a dead end; running ads without conversion tracking.
+          </div>
+
+          <div class="row">
+            <div class="who">
+              <div class="name">Northside Gas & Hot Water</div>
+              <div class="meta">northsidegas.example · (07) 5555 0456</div>
+            </div>
+            <div class="scores">
+              <span class="score a">86</span>
+              <span class="score b">79</span>
+              <span class="score c">83</span>
+            </div>
+          </div>
+          <div class="notes">
+            Site is slow on mobile; no GA4; contact page hides phone number.
+          </div>
+
+          <div class="panelFoot">
+            <span class="mono">You get the list + the reason.</span>
+            <a href="/register" class="textLink" data-track="panel_start_trial">Start trial</a>
+          </div>
+        </div>
+
+        <div class="panelHint" id="panelHint">
+          Click “View a sample” to reveal what the output looks like.
+        </div>
+      </div>
+    </section>
+
+    <section class="steps" id="how">
+      <h2>How it works</h2>
+      <div class="grid3">
+        <article class="card">
+          <h3><span class="n">01</span> Search</h3>
+          <p>Tell LeadSwarm a vertical and a location. It builds a prospect list from real search surfaces.</p>
+        </article>
+        <article class="card">
+          <h3><span class="n">02</span> Enrich</h3>
+          <p>Each prospect gets context: contact details and website signals that shape the pitch.</p>
+        </article>
+        <article class="card">
+          <h3><span class="n">03</span> Score</h3>
+          <p>Prioritize your next calls with clear Fit, Opportunity, and Priority scoring.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="proof" id="proof">
+      <h2>What you get</h2>
+      <div class="grid2">
+        <div class="bigCard">
+          <h3>One list. No guessing.</h3>
+          <ul>
+            <li>Contactability signals (email/phone when available)</li>
+            <li>Website stack + tracking hints</li>
+            <li>Plain-English notes you can paste into outreach</li>
+          </ul>
+          <a class="btn solid" href="/register" data-track="proof_start_trial">Start trial</a>
+        </div>
+        <div class="bigCard alt">
+          <h3>Works with your workflow.</h3>
+          <ul>
+            <li>Web app for daily use</li>
+            <li>Exports (CSV/JSON/Sheets) for ops</li>
+            <li>API surface for integrations</li>
+          </ul>
+          <a class="btn ghost" href="/app" data-track="proof_open_app">Open the app</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq" id="faq">
+      <h2>FAQ</h2>
+      <details>
+        <summary>Is this a contact database?</summary>
+        <p>No. LeadSwarm is a discovery + qualification engine. It helps you find prospects and prioritize outreach based on observable signals.</p>
+      </details>
+      <details>
+        <summary>What does “Start trial” mean?</summary>
+        <p>Create an account and you can run searches in the app. Usage limits depend on your plan and configuration.</p>
+      </details>
+      <details>
+        <summary>Can I use this outside Australia?</summary>
+        <p>The workflow is designed for English-language markets and local-services style searches. Availability depends on configured providers.</p>
+      </details>
+    </section>
+
+    <section class="final">
+      <div class="finalInner">
+        <h2>Stop prospecting like it’s 2016.</h2>
+        <p>Start with a list you can act on today.</p>
+        <a class="btn solid big" href="/register" data-track="final_start_trial">Start trial</a>
+        <p class="tiny">Already have an account? <a href="/login" class="textLink" data-track="final_login">Sign in</a>.</p>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <div class="footRow">
+        <div class="footBrand"><span class="mark small" aria-hidden="true"></span> LeadSwarm</div>
+        <div class="footLinks">
+          <a href="/app" data-track="footer_open_app">App</a>
+          <a href="/docs" data-track="footer_api_docs">API</a>
+        </div>
+      </div>
+      <div class="footFine">© <span id="year"></span> LeadSwarm</div>
+    </footer>
+  </main>
+
+  <script src="/site/site.js" defer></script>
+</body>
+</html>

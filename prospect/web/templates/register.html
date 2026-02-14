@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - Prospect Command Center</title>
+    <title>Sign Up - LeadSwarm</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>body { background: #0a0a0b; }</style>
 </head>
@@ -11,7 +11,7 @@
     <div class="w-full max-w-md p-8">
         <div class="text-center mb-8">
             <h1 class="text-2xl font-bold text-white mb-2">Create Account</h1>
-            <p class="text-zinc-400">Start finding prospects today</p>
+            <p class="text-zinc-400">Start your LeadSwarm trial</p>
         </div>
         
         <form id="register-form" class="space-y-4">
@@ -71,7 +71,7 @@
                 
                 localStorage.setItem("token", data.access_token);
                 localStorage.setItem("user", JSON.stringify(data.user));
-                window.location.href = "/";
+                window.location.href = "/app";
             } catch (err) {
                 error.textContent = "Network error. Please try again.";
                 error.classList.remove("hidden");
