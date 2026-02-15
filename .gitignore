@@ -86,6 +86,9 @@ logs/
 # Claude Code
 .claude/
 
+# Rust build artifacts
+rust/target/
+
 # Development docs (not for repo)
 CLAUDE_CODE_PLAN.md
 DECISION_SUMMARY.md
