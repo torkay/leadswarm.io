@@ -12,6 +12,7 @@ from .validation import (
     validate_phone_for_location,
     filter_emails_for_domain,
 )
+from . import _native
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +34,9 @@ def normalize_domain(url: str) -> Optional[str]:
         "not a url" -> None
         "https:" -> None
     """
+    if _native.normalize_domain is not None:
+        return _native.normalize_domain(url)
+
     if not url:
         return None
 
@@ -83,6 +87,9 @@ def normalize_name(name: str) -> str:
     Returns:
         Normalized name (lowercase, no special chars)
     """
+    if _native.normalize_name is not None:
+        return _native.normalize_name(name)
+
     if not name:
         return ""
 
@@ -125,6 +132,9 @@ def is_directory_url(url: str, domain: str) -> bool:
     Returns:
         True if it's a directory site that should be filtered out
     """
+    if _native.is_directory_url is not None:
+        return _native.is_directory_url(url, domain)
+
     if not domain:
         return False
 

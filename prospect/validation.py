@@ -3,6 +3,8 @@
 import re
 from typing import Optional, Tuple
 
+from . import _native
+
 # Australian phone area codes by state
 AU_AREA_CODES = {
     # State: (landline_prefix, description)
@@ -102,6 +104,9 @@ def normalize_phone(phone: str) -> str:
     Returns:
         Normalized phone number with only digits, or empty string
     """
+    if _native.normalize_phone is not None:
+        return _native.normalize_phone(phone)
+
     if not phone:
         return ""
 
@@ -202,6 +207,9 @@ def clean_business_name(name: str) -> str:
     Returns:
         Cleaned business name
     """
+    if _native.clean_business_name is not None:
+        return _native.clean_business_name(name)
+
     if not name:
         return ""
 
@@ -256,6 +264,9 @@ def validate_email_domain(email: str, website_domain: str) -> Tuple[bool, str]:
     Returns:
         Tuple of (is_valid, reason)
     """
+    if _native.validate_email_domain is not None:
+        return _native.validate_email_domain(email, website_domain)
+
     if not email or not website_domain:
         return True, "No email or domain"
 
@@ -319,6 +330,9 @@ def filter_emails_for_domain(emails: list, website_domain: str) -> list:
     Returns:
         Filtered list of valid emails
     """
+    if _native.filter_emails_for_domain is not None:
+        return _native.filter_emails_for_domain(emails or [], website_domain)
+
     if not emails:
         return []
 

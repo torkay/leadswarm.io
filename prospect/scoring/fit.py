@@ -1,6 +1,7 @@
 """Fit score calculation - Can we reach this prospect?"""
 
 from typing import Optional
+from .. import _native
 from ..config import ScoringConfig
 from ..models import Prospect
 
@@ -22,6 +23,9 @@ def calculate_fit_score(
     Returns:
         Fit score from 0-100
     """
+    if _native.calculate_fit_score is not None and config is None:
+        return _native.calculate_fit_score(prospect.to_dict())
+
     config = config or ScoringConfig()
     score = 0
 

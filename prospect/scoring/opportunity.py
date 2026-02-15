@@ -1,6 +1,7 @@
 """Opportunity score calculation - Do they need marketing help?"""
 
 from typing import Optional
+from .. import _native
 from ..config import ScoringConfig
 from ..models import Prospect, WebsiteSignals
 
@@ -22,6 +23,9 @@ def calculate_opportunity_score(
     Returns:
         Opportunity score from 0-100
     """
+    if _native.calculate_opportunity_score is not None and config is None:
+        return _native.calculate_opportunity_score(prospect.to_dict())
+
     config = config or ScoringConfig()
     score = 0
 

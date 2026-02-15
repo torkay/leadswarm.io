@@ -2,6 +2,7 @@
 
 from typing import Optional, Dict
 
+from .. import _native
 from ..config import CMS_SIGNATURES, TRACKING_SIGNATURES, BOOKING_SIGNATURES
 
 
@@ -15,6 +16,9 @@ def detect_cms(html: str) -> Optional[str]:
     Returns:
         CMS name if detected, None otherwise
     """
+    if _native.detect_cms is not None:
+        return _native.detect_cms(html or "")
+
     if not html:
         return None
 
@@ -38,6 +42,9 @@ def detect_tracking(html: str) -> Dict[str, bool]:
     Returns:
         Dictionary with tracking tool detection results
     """
+    if _native.detect_tracking is not None:
+        return _native.detect_tracking(html or "")
+
     result = {
         "google_analytics": False,
         "facebook_pixel": False,
@@ -68,6 +75,9 @@ def detect_booking_system(html: str) -> bool:
     Returns:
         True if booking system detected, False otherwise
     """
+    if _native.detect_booking_system is not None:
+        return _native.detect_booking_system(html or "")
+
     if not html:
         return False
 
@@ -112,6 +122,9 @@ def detect_frameworks(html: str) -> list[str]:
     Returns:
         List of detected frameworks
     """
+    if _native.detect_frameworks is not None:
+        return _native.detect_frameworks(html or "")
+
     frameworks = []
 
     if not html:
@@ -147,6 +160,9 @@ def detect_responsive(html: str) -> bool:
     Returns:
         True if responsive indicators found
     """
+    if _native.detect_responsive is not None:
+        return _native.detect_responsive(html or "")
+
     if not html:
         return False
 

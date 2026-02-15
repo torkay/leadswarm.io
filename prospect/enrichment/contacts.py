@@ -3,6 +3,7 @@
 import re
 from typing import List
 
+from .. import _native
 from ..config import PHONE_PATTERNS, EMAIL_PATTERN, SPAM_EMAIL_PATTERNS, SPAM_EMAIL_DOMAINS
 
 
@@ -42,6 +43,9 @@ def extract_emails(html: str) -> List[str]:
     Returns:
         List of unique, valid email addresses found
     """
+    if _native.extract_emails is not None:
+        return _native.extract_emails(html or "")
+
     if not html:
         return []
 
@@ -122,6 +126,9 @@ def extract_phones(html: str) -> List[str]:
     Returns:
         List of unique phone numbers found
     """
+    if _native.extract_phones is not None:
+        return _native.extract_phones(html or "")
+
     if not html:
         return []
 
