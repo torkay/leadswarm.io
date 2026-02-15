@@ -1,16 +1,16 @@
-# Prospect Command Center
+# Leadswarm.io
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/torkay/prospect-command-center)
 
 <div align="center">
 
-<img src="docs/assets/architecture-a3.png" alt="Prospect Command Center – System Architecture & Data Flow" width="1200" />
+<img src="docs/assets/architecture-a3.png" alt="Leadswarm.io – System Architecture & Data Flow" width="1200" />
 
 </div>
 
 Better prospect discovery and qualification for internal marketing agent use.
 
-Prospect Command Center combines automated Google search (via SerpAPI) with website enrichment and a scoring engine to surface high‑value prospects and manage them through a simple pipeline.
+Leadswarm.io combines automated Google search (via SerpAPI) with website enrichment and a scoring engine to surface high‑value prospects and manage them through a simple pipeline.
 
 Smart discovery • Intelligent scoring • Pipeline workflow • Modern web UI
 
